@@ -82,7 +82,7 @@ func (s *AuthService) GenerateToken(userID, email string) (string, error) {
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 			NotBefore: jwt.NewNumericDate(time.Now()),
-			Issuer:    "your-app-name",
+			Issuer:    "jokowi",
 		},
 	}
 

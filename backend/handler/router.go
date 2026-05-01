@@ -23,6 +23,16 @@ func NewServer(queries *db.Queries, authService *service.AuthService) *Server {
 	router.GET("/hotels", server.HotelLists)
 	router.POST("/login", server.authHandler.Login)
 	router.POST("/register", server.authHandler.Register)
+	router.GET("/concerts", server.UpcomingConcerts)
+	router.GET("/concerts/:id", server.ConcertsById)
+	router.GET("/route/:id", server.VenueRoutes)
+
+	protected := router.Group("/")
+	protected.Use(server.authHandler.AuthMiddleware())
+	{
+		protected.POST("/itinerary", server.CreateItinerary)
+		protected.GET("/itinerary", server.UserItineraries)
+	}
 
 	server.router = router
 	return server

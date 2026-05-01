@@ -2,7 +2,7 @@ CREATE TABLE users (
     id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     email      VARCHAR(255) UNIQUE NOT NULL CHECK (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'),
     password   TEXT NOT NULL,
-    created_at TIMESTAMPTZ DEFAULT NOW()
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE venues (
@@ -56,5 +56,5 @@ CREATE TABLE itineraries (
     hotel_id              INT REFERENCES hotels(id),
     transport_to_venue    INT REFERENCES transport_routes(id),
     transport_from_venue  INT REFERENCES transport_routes(id),
-    created_at            TIMESTAMPTZ DEFAULT NOW()
+    created_at            TIMESTAMPTZ NOT NULL DEFAULT NOW()
 )

@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"github.com/nadhif71/Project-Klepon-Boys/db"
 	api "github.com/nadhif71/Project-Klepon-Boys/handler"
@@ -23,6 +24,7 @@ func main() {
 
 	queries := db.New(conn)
 
+	godotenv.Load()
 	jwtSecret := []byte(os.Getenv("JWT_SECRET"))
 	authService := service.NewAuthService(queries, jwtSecret)
 
