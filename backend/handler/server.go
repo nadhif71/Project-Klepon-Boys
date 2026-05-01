@@ -10,14 +10,19 @@ type Server struct {
 	queries          *db.Queries
 	router           *gin.Engine
 	authHandler      *AuthHandler
-	itineraryHandler *IitineraryHandler
+	itineraryHandler *ItineraryHandler
+	concertHandler   *ConcertHandler
+	routeHandler     *RouteHandler
 }
 
-func NewServer(queries *db.Queries, authService *service.AuthService, itineraryService *service.ItineraryService) *Server {
+func NewServer(queries *db.Queries, authService *service.AuthService, itineraryService *service.ItineraryService,
+	concertService *service.ConcertService, routeService *service.RouteService) *Server {
 	server := &Server{
 		queries:          queries,
 		authHandler:      NewAuthHandler(authService),
 		itineraryHandler: NewItineraryHandler(itineraryService),
+		concertHandler:   NewConcertHandler(concertService),
+		routeHandler:     NewRouteHandler(routeService),
 	}
 
 	router := gin.Default()
@@ -25,15 +30,15 @@ func NewServer(queries *db.Queries, authService *service.AuthService, itineraryS
 	router.GET("/hotels", server.HotelLists)
 	router.POST("/login", server.authHandler.Login)
 	router.POST("/register", server.authHandler.Register)
-	router.GET("/concerts", server.UpcomingConcerts)
-	router.GET("/concerts/:id", server.ConcertsById)
-	router.GET("/route/:id", server.VenueRoutes)
+	router.GET("/concerts", server.concertHandler.UpcomingConcerts)
+	router.GET("/concerts/:id", server.concertHandler.ConcertsById)
+	router.GET("/route/:id", server.routeHandler.VenueRoutes)
 
 	protected := router.Group("/")
 	protected.Use(server.authHandler.AuthMiddleware())
 	{
 		protected.POST("/itinerary", server.itineraryHandler.CreateItinerary)
-		protected.GET("/itinerary", server.UserItineraries)
+		protected.GET("/itinerary", server.itineraryHandler.UserItineraries)
 	}
 
 	server.router = router

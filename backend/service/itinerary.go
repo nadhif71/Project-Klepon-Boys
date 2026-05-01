@@ -84,3 +84,7 @@ func (s *ItineraryService) CreateItinerary(ctx context.Context, userID uuid.Null
 	itinerary, err := s.db.CreateItinerary(ctx, dbParams)
 	return itinerary, err
 }
+
+func (s *ItineraryService) GetUserItineraries(ctx context.Context, userID uuid.NullUUID) ([]db.GetUserItinerariesRow, error) {
+	return s.db.GetUserItineraries(ctx, userID)
+}

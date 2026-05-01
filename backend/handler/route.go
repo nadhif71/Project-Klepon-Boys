@@ -1,14 +1,24 @@
 package handler
 
 import (
-	"database/sql"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/nadhif71/Project-Klepon-Boys/service"
 )
 
-func (s *Server) VenueRoutes(c *gin.Context) {
+type RouteHandler struct {
+	routeService *service.RouteService
+}
+
+func NewRouteHandler(routeService *service.RouteService) *RouteHandler {
+	return &RouteHandler{
+		routeService: routeService,
+	}
+}
+
+func (h *RouteHandler) VenueRoutes(c *gin.Context) {
 	idStr := c.Param("id")
 
 	dest_id, err := strconv.Atoi(idStr)
@@ -17,6 +27,6 @@ func (s *Server) VenueRoutes(c *gin.Context) {
 		return
 	}
 
-	res, _ := s.queries.GetRoutesForVenue(c, sql.NullInt32{Int32: int32(dest_id), Valid: true})
+	res, _ := h.routeService.GetRoutesForVenue(c, dest_id)
 	c.JSON(http.StatusOK, res)
 }

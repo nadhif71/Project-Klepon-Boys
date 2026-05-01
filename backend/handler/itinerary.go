@@ -8,15 +8,15 @@ import (
 	"github.com/nadhif71/Project-Klepon-Boys/service"
 )
 
-type IitineraryHandler struct {
+type ItineraryHandler struct {
 	itineraryService *service.ItineraryService
 }
 
-func NewItineraryHandler(itineraryService *service.ItineraryService) *IitineraryHandler {
-	return &IitineraryHandler{itineraryService: itineraryService}
+func NewItineraryHandler(itineraryService *service.ItineraryService) *ItineraryHandler {
+	return &ItineraryHandler{itineraryService: itineraryService}
 }
 
-func (h *IitineraryHandler) CreateItinerary(c *gin.Context) {
+func (h *ItineraryHandler) CreateItinerary(c *gin.Context) {
 	var req service.ItineraryRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -55,7 +55,7 @@ func (h *IitineraryHandler) CreateItinerary(c *gin.Context) {
 	c.JSON(http.StatusOK, itinerary)
 }
 
-func (s *Server) UserItineraries(c *gin.Context) {
+func (h *ItineraryHandler) UserItineraries(c *gin.Context) {
 
 	userIDInterface, exists := c.Get("user_id")
 	if !exists {
@@ -69,7 +69,7 @@ func (s *Server) UserItineraries(c *gin.Context) {
 		return
 	}
 
-	userItenerary, err := s.queries.GetUserItineraries(c, userID)
+	userItenerary, err := h.itineraryService.GetUserItineraries(c, userID)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})

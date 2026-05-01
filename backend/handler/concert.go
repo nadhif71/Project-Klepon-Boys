@@ -5,14 +5,23 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/nadhif71/Project-Klepon-Boys/service"
 )
 
-func (s *Server) UpcomingConcerts(c *gin.Context) {
-	res, _ := s.queries.ListUpcomingConcerts(c)
+type ConcertHandler struct {
+	concertService *service.ConcertService
+}
+
+func NewConcertHandler(concertService *service.ConcertService) *ConcertHandler {
+	return &ConcertHandler{concertService: concertService}
+}
+
+func (h *ConcertHandler) UpcomingConcerts(c *gin.Context) {
+	res, _ := h.concertService.ListUpcomingConcerts(c)
 	c.JSON(http.StatusOK, res)
 }
 
-func (s *Server) ConcertsById(c *gin.Context) {
+func (h *ConcertHandler) ConcertsById(c *gin.Context) {
 	idStr := c.Param("id")
 
 	id, err := strconv.Atoi(idStr)
@@ -21,6 +30,6 @@ func (s *Server) ConcertsById(c *gin.Context) {
 		return
 	}
 
-	res, _ := s.queries.GetConcert(c, int32(id))
+	res, _ := h.concertService.ConcertsById(c, id)
 	c.JSON(http.StatusOK, res)
 }
