@@ -2,43 +2,39 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/nadhif71/Project-Klepon-Boys/db"
 	"github.com/nadhif71/Project-Klepon-Boys/service"
 )
 
 type Server struct {
-	queries          *db.Queries
-	router           *gin.Engine
-	authHandler      *AuthHandler
-	itineraryHandler *ItineraryHandler
-	concertHandler   *ConcertHandler
-	routeHandler     *RouteHandler
+	services *service.Services
+	router   *gin.Engine
 }
 
-func NewServer(queries *db.Queries, authService *service.AuthService, itineraryService *service.ItineraryService,
-	concertService *service.ConcertService, routeService *service.RouteService) *Server {
+func NewServer(svcs *service.Services) *Server {
 	server := &Server{
-		queries:          queries,
-		authHandler:      NewAuthHandler(authService),
-		itineraryHandler: NewItineraryHandler(itineraryService),
-		concertHandler:   NewConcertHandler(concertService),
-		routeHandler:     NewRouteHandler(routeService),
+		services: svcs,
 	}
+
+	authHandler := NewAuthHandler(svcs.Auth)
+	itineraryHandler := NewItineraryHandler(svcs.Itinerary)
+	concertHandler := NewConcertHandler(svcs.Concert)
+	routeHandler := NewRouteHandler(svcs.Route)
+	hotelHandler := NewHotelHandler(svcs.Hotel)
 
 	router := gin.Default()
 
-	router.GET("/hotels", server.HotelLists)
-	router.POST("/login", server.authHandler.Login)
-	router.POST("/register", server.authHandler.Register)
-	router.GET("/concerts", server.concertHandler.UpcomingConcerts)
-	router.GET("/concerts/:id", server.concertHandler.ConcertsById)
-	router.GET("/route/:id", server.routeHandler.VenueRoutes)
+	router.GET("/hotels", hotelHandler.HotelLists)
+	router.POST("/login", authHandler.Login)
+	router.POST("/register", authHandler.Register)
+	router.GET("/concerts", concertHandler.UpcomingConcerts)
+	router.GET("/concerts/:id", concertHandler.ConcertsById)
+	router.GET("/route/:id", routeHandler.VenueRoutes)
 
 	protected := router.Group("/")
-	protected.Use(server.authHandler.AuthMiddleware())
+	protected.Use(authHandler.AuthMiddleware())
 	{
-		protected.POST("/itinerary", server.itineraryHandler.CreateItinerary)
-		protected.GET("/itinerary", server.itineraryHandler.UserItineraries)
+		protected.POST("/itinerary", itineraryHandler.CreateItinerary)
+		protected.GET("/itinerary", itineraryHandler.UserItineraries)
 	}
 
 	server.router = router

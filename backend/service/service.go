@@ -1,0 +1,21 @@
+package service
+
+import "github.com/nadhif71/Project-Klepon-Boys/db"
+
+type Services struct {
+	Auth      *AuthService
+	Itinerary *ItineraryService
+	Concert   *ConcertService
+	Route     *RouteService
+	Hotel     *HotelService
+}
+
+func NewServices(queries *db.Queries, jwtSecret []byte) *Services {
+	return &Services{
+		Auth:      NewAuthService(queries, jwtSecret),
+		Itinerary: NewItinearyService(queries),
+		Concert:   NewConcertService(queries),
+		Route:     NewRouteService(queries),
+		Hotel:     NewHotelServices(queries),
+	}
+}

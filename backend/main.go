@@ -23,12 +23,9 @@ func main() {
 	queries := db.New(conn)
 
 	jwtSecret := []byte(os.Getenv("JWT_SECRET"))
-	authService := service.NewAuthService(queries, jwtSecret)
-	itineraryService := service.NewItinearyService(queries)
-	concertService := service.NewConcertService(queries)
-	routeService := service.NewRouteService(queries)
 
-	server := handler.NewServer(queries, authService, itineraryService, concertService, routeService)
+	svcs := service.NewServices(queries, jwtSecret)
+	server := handler.NewServer(svcs)
 
 	err = server.Start(":8080")
 	if err != nil {
