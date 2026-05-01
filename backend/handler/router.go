@@ -7,15 +7,17 @@ import (
 )
 
 type Server struct {
-	queries     *db.Queries
-	router      *gin.Engine
-	authHandler *AuthHandler
+	queries          *db.Queries
+	router           *gin.Engine
+	authHandler      *AuthHandler
+	itineraryHandler *IitineraryHandler
 }
 
-func NewServer(queries *db.Queries, authService *service.AuthService) *Server {
+func NewServer(queries *db.Queries, authService *service.AuthService, itineraryService *service.ItineraryService) *Server {
 	server := &Server{
-		queries:     queries,
-		authHandler: NewAuthHandler(authService),
+		queries:          queries,
+		authHandler:      NewAuthHandler(authService),
+		itineraryHandler: NewItineraryHandler(itineraryService),
 	}
 
 	router := gin.Default()
@@ -30,7 +32,7 @@ func NewServer(queries *db.Queries, authService *service.AuthService) *Server {
 	protected := router.Group("/")
 	protected.Use(server.authHandler.AuthMiddleware())
 	{
-		protected.POST("/itinerary", server.CreateItinerary)
+		protected.POST("/itinerary", server.itineraryHandler.CreateItinerary)
 		protected.GET("/itinerary", server.UserItineraries)
 	}
 

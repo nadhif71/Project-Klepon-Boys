@@ -13,6 +13,7 @@ CREATE TABLE venues (
     longitude   DECIMAL(9,6) NOT NULL
 );
 
+-- todo: nama artis
 CREATE TABLE concerts (
     id          SERIAL PRIMARY KEY,
     venue_id    INT REFERENCES venues(id) ON DELETE CASCADE,

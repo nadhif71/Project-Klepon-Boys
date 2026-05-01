@@ -5,11 +5,18 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/nadhif71/Project-Klepon-Boys/db"
 	"github.com/nadhif71/Project-Klepon-Boys/service"
 )
 
-func (s *Server) CreateItinerary(c *gin.Context) {
+type IitineraryHandler struct {
+	itineraryService *service.ItineraryService
+}
+
+func NewItineraryHandler(itineraryService *service.ItineraryService) *IitineraryHandler {
+	return &IitineraryHandler{itineraryService: itineraryService}
+}
+
+func (h *IitineraryHandler) CreateItinerary(c *gin.Context) {
 	var req service.ItineraryRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -30,13 +37,16 @@ func (s *Server) CreateItinerary(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID format"})
 		return
 	}
-	itinerary, err := s.queries.CreateItinerary(c, db.CreateItineraryParams{
-		UserID:             userID,
+
+	params := service.ItineraryDB{
 		ConcertID:          dbItinerary.ConcertID,
 		HotelID:            dbItinerary.HotelID,
 		TransportToVenue:   dbItinerary.TransportToVenue,
 		TransportFromVenue: dbItinerary.TransportFromVenue,
-	})
+	}
+
+	itinerary, err := h.itineraryService.CreateItinerary(c, userID, params)
+
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Theres a mistake at database inputting"})
 		return

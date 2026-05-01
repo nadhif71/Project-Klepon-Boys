@@ -1,8 +1,11 @@
 package service
 
 import (
+	"context"
 	"database/sql"
 	"log"
+
+	"github.com/nadhif71/Project-Klepon-Boys/db"
 
 	"github.com/google/uuid"
 )
@@ -60,4 +63,24 @@ func StringToNullUUID(userIDInterface any) (uuid.NullUUID, error) {
 	}
 
 	return userID, nil
+}
+
+type ItineraryService struct {
+	db *db.Queries
+}
+
+func NewItinearyService(db *db.Queries) *ItineraryService {
+	return &ItineraryService{db: db}
+}
+
+func (s *ItineraryService) CreateItinerary(ctx context.Context, userID uuid.NullUUID, params ItineraryDB) (db.CreateItineraryRow, error) {
+	dbParams := db.CreateItineraryParams{
+		UserID:             userID,
+		ConcertID:          params.ConcertID,
+		HotelID:            params.HotelID,
+		TransportToVenue:   params.TransportToVenue,
+		TransportFromVenue: params.TransportFromVenue,
+	}
+	itinerary, err := s.db.CreateItinerary(ctx, dbParams)
+	return itinerary, err
 }
