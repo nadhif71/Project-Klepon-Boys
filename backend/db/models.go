@@ -84,17 +84,25 @@ type Hotel struct {
 	Facilities []string
 }
 
-type Itinerary struct {
-	ID                 uuid.UUID
-	UserID             uuid.NullUUID
-	TicketID           sql.NullInt32
-	HotelID            sql.NullInt32
-	HotelCheckIn       sql.NullTime
-	HotelCheckOut      sql.NullTime
-	TransportToVenue   sql.NullInt32
-	TransportFromVenue sql.NullInt32
-	OutOfTownTransport pqtype.NullRawMessage
-	CreatedAt          time.Time
+type HotelBooking struct {
+	ID           int32
+	UserID       uuid.NullUUID
+	HotelID      sql.NullInt32
+	CheckInDate  time.Time
+	CheckOutDate time.Time
+	Status       string
+	CreatedAt    time.Time
+}
+
+type IntercityTransport struct {
+	ID            int32
+	UserID        uuid.NullUUID
+	OriginCity    string
+	TransportMode string
+	DepartureDate time.Time
+	ReturnDate    sql.NullTime
+	Status        string
+	CreatedAt     time.Time
 }
 
 type PickupPoint struct {
@@ -112,6 +120,15 @@ type Ticket struct {
 	Tier      string
 	Price     string
 	Stock     int32
+}
+
+type TicketOrder struct {
+	ID        int32
+	UserID    uuid.NullUUID
+	TicketID  sql.NullInt32
+	Quantity  int32
+	Status    string
+	CreatedAt time.Time
 }
 
 type TransportGeometry struct {

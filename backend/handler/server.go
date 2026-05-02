@@ -16,10 +16,10 @@ func NewServer(svcs *service.Services) *Server {
 	}
 
 	authHandler := NewAuthHandler(svcs.Auth)
-	itineraryHandler := NewItineraryHandler(svcs.Itinerary)
 	concertHandler := NewConcertHandler(svcs.Concert)
 	routeHandler := NewRouteHandler(svcs.Route)
 	hotelHandler := NewHotelHandler(svcs.Hotel)
+	tiketHandler := NewTicketHandler(svcs.Ticket)
 
 	router := gin.Default()
 
@@ -29,12 +29,14 @@ func NewServer(svcs *service.Services) *Server {
 	router.GET("/concerts", concertHandler.UpcomingConcerts)
 	router.GET("/concerts/:id", concertHandler.ConcertsById)
 	router.GET("/route/:id", routeHandler.VenueRoutes)
+	router.GET("/concert/:id/tickets", tiketHandler.GetTicketsForConcert)
+	router.PATCH("/tickets/:id", tiketHandler.UpdateTicketStock)
 
 	protected := router.Group("/")
 	protected.Use(authHandler.AuthMiddleware())
 	{
-		protected.POST("/itinerary", itineraryHandler.CreateItinerary)
-		protected.GET("/itinerary", itineraryHandler.UserItineraries)
+		protected.POST("/ticketorders", tiketHandler.CreateTicketOrder)
+		protected.GET("/ticketorders", tiketHandler.GetTicketOrdersByUser)
 	}
 
 	server.router = router

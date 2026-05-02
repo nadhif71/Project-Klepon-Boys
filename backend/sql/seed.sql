@@ -1,114 +1,100 @@
 -- =====================================================
--- SEED DATA FOR INDONESIA MUSIC EVENT APP
+-- SEED DATA FOR DATABASE TESTING (Indonesia Edition)
 -- =====================================================
 
--- 1. USERS (FR-01)
-INSERT INTO users (id, email, password, role) VALUES
-  (gen_random_uuid(), 'admin@nusantaratix.com', '$2a$10$dummyHashedPasswordForAdmin123', 'Admin'),
-  (gen_random_uuid(), 'budi.wijaya@example.com', '$2a$10$dummyHashedPasswordForUser1', 'User'),
-  (gen_random_uuid(), 'sari.rahayu@example.com', '$2a$10$dummyHashedPasswordForUser2', 'User'),
-  (gen_random_uuid(), 'dimas.p@example.com', '$2a$10$dummyHashedPasswordForUser3', 'User');
+-- 1. Users (3 rows)
+INSERT INTO users (id, email, password, role, created_at) VALUES
+    (gen_random_uuid(), 'budi.wijaya@email.com', '$2a$10$encrypted_password_hash_here', 'User', NOW()),
+    (gen_random_uuid(), 'sari.dewi@email.com', '$2a$10$encrypted_password_hash_here', 'Admin', NOW()),
+    (gen_random_uuid(), 'agus.santoso@email.com', '$2a$10$encrypted_password_hash_here', 'User', NOW());
 
--- 2. VENUES (Jakarta & surroundings)
+-- 2. Venues (3 rows - Indonesian concert venues)
 INSERT INTO venues (name, address, latitude, longitude) VALUES
-  ('GBK Main Stadium', 'Jl. Gerbang Pemuda No.1, Gelora, Jakarta Pusat', -6.216667, 106.803889),
-  ('Beach City International Stadium', 'Jl. Pantai Indah Utara 2, Kapuk Muara, Jakarta Utara', -6.121667, 106.766944),
-  ('Ecovention Hall - Ancol', 'Eco Art Park, Ancol, Pademangan, Jakarta Utara', -6.119444, 106.836111),
-  ('Ciputra Artpreneur', 'Jl. Prof. Dr. Satrio Kav. 3-5, Kuningan, Jakarta Selatan', -6.226389, 106.820278);
+    ('GBK Stadium', 'Jl. Pintu Satu Senayan, Jakarta Pusat, DKI Jakarta 10270', -6.218620, 106.802620),
+    ('Eco Park Hall', 'Pantai Indah Kapuk, Jakarta Utara, DKI Jakarta 14460', -6.116420, 106.721540),
+    ('Civic Center Hall', 'Jl. Raya Juanda No.12, Bandung, Jawa Barat 40116', -6.906070, 107.619120);
 
--- 3. CONCERTS with Indonesian artists
+-- 3. Concerts (3 rows - Indonesian artists)
 INSERT INTO concerts (venue_id, title, artist_name, event_date, description) VALUES
-  (1, 'Pestapora 2025 - Jakarta', 'Hindia, Lomba Sihir, Nadin Amizah', '2025-11-15 14:00:00+07', 'Festival musik alternatif terbesar di GBK'),
-  (1, 'Raisa LIVE in Concert', 'Raisa Andriana', '2025-12-01 19:30:00+07', 'Solo konser Raisa untuk album terbaru'),
-  (2, 'DWP 2025 - Djakarta Warehouse Project', 'Weird Genius, NIKI, Rich Brian', '2025-12-05 16:00:00+07', 'EDM & hip hop festival di BSD'),
-  (3, 'Java Jazz 2025 (Festival Aja)', 'Tulus, Maliq & Dssentials', '2025-09-20 18:00:00+07', 'Suasana jazz by the beach'),
-  (4, 'Bernadya Album Launch', 'Bernadya', '2025-10-10 20:00:00+07', 'Intimate showcase di Ciputra Artpreneur');
+    (1, 'Dangdut Nasional 2025', 'Via Vallen', '2025-07-15 19:00:00+07', 'Konser akbar dangdut Indonesia dengan bintang tamu spesial'),
+    (2, 'Jazz PIK Festival', 'Andmesh Kamaleng', '2025-08-20 20:00:00+07', 'Malam jazz romantis dengan artist terkenal Indonesia'),
+    (3, 'Pop Sunda Live', 'Mawar de Jongh', '2025-09-10 18:30:00+07', 'Konser musik pop Sunda di kota kembang Bandung');
 
--- 4. TICKETS (FR-02) - prices in IDR
+-- 4. Tickets (3 rows per concert - tiered pricing)
+-- Untuk Concert 1: GBK Stadium (concert_id = 1)
 INSERT INTO tickets (concert_id, tier, price, stock) VALUES
-  -- Pestapora
-  (1, 'Festival (Early Bird)', 350000, 500),
-  (1, 'Festival (Presale)', 450000, 1000),
-  (1, 'VIP South', 850000, 200),
-  -- Raisa
-  (2, 'CAT 3', 400000, 800),
-  (2, 'CAT 2', 650000, 500),
-  (2, 'VIP (Meet & Greet)', 1500000, 50),
-  -- DWP
-  (3, 'Single Day', 890000, 3000),
-  (3, '2-Day Pass', 1550000, 1200),
-  -- Java Jazz
-  (4, 'Weekend Pass', 1100000, 400),
-  (4, 'VIP Jazz Lounge', 2100000, 80),
-  -- Bernadya
-  (5, 'Bronze', 250000, 150),
-  (5, 'Gold (Early Entry)', 420000, 60);
+    (1, 'VIP (Tribune Barat)', 1250000.00, 500),
+    (1, 'Festival (Tribune Timur)', 750000.00, 2000),
+    (1, 'Economy (Gate C)', 350000.00, 5000);
+-- Untuk Concert 2: Jazz PIK (concert_id = 2)
+INSERT INTO tickets (concert_id, tier, price, stock) VALUES
+    (2, 'VIP Indoor', 1500000.00, 100),
+    (2, 'Outdoor Festival', 850000.00, 800),
+    (2, 'Early Bird', 450000.00, 1500);
+-- Untuk Concert 3: Pop Sunda (concert_id = 3)
+INSERT INTO tickets (concert_id, tier, price, stock) VALUES
+    (3, 'Platinum', 950000.00, 150),
+    (3, 'Gold', 550000.00, 400),
+    (3, 'Silver', 250000.00, 1000);
 
--- 5. HOTELS (FR-03) - near the venues with bintang & facilities
+-- 5. Hotels (3 rows - near concert venues)
 INSERT INTO hotels (name, address, latitude, longitude, price_est, star_rating, facilities) VALUES
-  ('Pullman Jakarta Central Park', 'Podomoro City, Letjen S Parman, Tanjung Duren', -6.1719, 106.7921, 1250000, 5, ARRAY['Pool', 'Spa', 'Fitness Center', 'Family Room', 'Restaurant', 'Free WiFi']),
-  ('Ashley Hotel Wahid Hasyim', 'Jl. K.H. Wahid Hasyim No.101, Menteng', -6.1857, 106.8272, 850000, 4, ARRAY['Restaurant', 'Fitness', 'Meeting Room', 'Free WiFi']),
-  ('Ibis Styles Jakarta Mangga Dua', 'Jl. Pangeran Jayakarta No.70, Mangga Dua', -6.1445, 106.8237, 490000, 3, ARRAY['Restaurant', 'Free WiFi', '24h Front Desk', 'Parking']),
-  ('Mercure Convention Center Ancol', 'Jl. Pantai Indah, Ancol, Pademangan', -6.1240, 106.8365, 675000, 4, ARRAY['Pool', 'Conference Hall', 'Kids Playground', 'Sea View']),
-  ('Artotel Thamras', 'Jl. Cilandak KKO No.66, Cilandak Barat', -6.2995, 106.7911, 950000, 4, ARRAY['Rooftop Bar', 'Art Gallery', 'Swimming Pool', 'Free WiFi']);
+    ('Hotel Mulia Senayan', 'Jl. Asia Afrika No.8, Senayan, Jakarta Pusat', -6.222370, 106.803920, 1800000.00, 5, ARRAY['Swimming Pool', 'Spa', 'Restaurant', 'Free WiFi', 'Parking']),
+    ('Fairmont Jakarta', 'Jl. Asia Afrika No.8, Gelora, Jakarta Pusat', -6.220010, 106.803630, 2200000.00, 5, ARRAY['Sky Pool', 'Gym', 'Fine Dining', 'Ballroom']),
+    ('Padma Hotel Bandung', 'Jl. Ranca Bentang No.56, Ciumbuleuit, Bandung', -6.873010, 107.601200, 1200000.00, 4, ARRAY['Infinity Pool', 'Spa', 'Kids Club', 'Restaurant']);
 
--- 6. PUBLIC TRANSPORT (MRT, Transjakarta, JakLingko)
+-- 6. Transport Routes (3 rows - MRT, TransJakarta, JakLingko)
 INSERT INTO transport_routes (mode, route_name, origin_name, destination_id, est_price, est_duration) VALUES
-  ('MRT', 'MRT Red Line (Lebak Bulus - Bundaran HI)', 'Bundaran HI Station', 1, 14000, 35),
-  ('MRT', 'MRT Red Line + shuttle', 'Lebak Bulus Grab Dropoff', 2, 18000, 55),
-  ('TransJakarta', 'Koridor 1 (Blok M - Kota)', 'Halte Monas', 1, 3500, 25),
-  ('TransJakarta', 'Koridor 10 (PGC - Tanjung Priok)', 'Ancol Stasiun', 3, 4500, 18),
-  ('JakLingko', 'Mikrotrans JAK-74 (Taman Kota - Ancol)', 'Pademangan', 3, 5000, 22),
-  ('TransJakarta', 'Koridor 6 (Ragunan - Galunggung)', 'Kuningan', 4, 4500, 12),
-  ('MRT', 'MRT + Feeder (Hotel Indonesia - Kuningan)', 'Dukuh Atas BNI', 4, 10000, 20);
+    ('MRT', 'MRT Jakarta Lebak Bulus - Bundaran HI', 'Lebak Bulus Station', 1, 14000.00, 35),
+    ('TransJakarta', 'Koridor 1 (Blok M - Kota)', 'Blok M Shelter', 1, 3500.00, 45),
+    ('JakLingko', 'Mikrotrans Jak Lingko JAK-13', 'Tanah Abang Station', 2, 5000.00, 25);
 
--- Geometry paths (mock GeoJSON for frontend maps)
+-- Transport Geometries (matching route_ids above)
 INSERT INTO transport_geometries (route_id, path_json) VALUES
-  (1, '{"type":"LineString","coordinates":[[106.827, -6.194],[106.820, -6.200],[106.812, -6.208],[106.803, -6.218]]}'),
-  (3, '{"type":"LineString","coordinates":[[106.822, -6.180],[106.815, -6.190],[106.808, -6.205]]}'),
-  (7, '{"type":"LineString","coordinates":[[106.828, -6.202],[106.825, -6.210],[106.822, -6.222]]}');
+    (1, '{"type": "LineString", "coordinates": [[106.802620, -6.218620], [106.810000, -6.200000], [106.820000, -6.190000]]}'),
+    (2, '{"type": "LineString", "coordinates": [[106.802620, -6.218620], [106.800000, -6.210000], [106.795000, -6.195000]]}'),
+    (3, '{"type": "LineString", "coordinates": [[106.721540, -6.116420], [106.730000, -6.110000], [106.740000, -6.100000]]}');
 
--- 7. PICKUP POINTS & CROWD TRACKING (FR-06)
+-- 7. Pickup Points (3 rows - near venues)
 INSERT INTO pickup_points (venue_id, name, latitude, longitude, max_capacity) VALUES
-  (1, 'GBK East Gate - Sisi Timur', -6.2177, 106.8079, 800),
-  (1, 'GBK Bus Terminal', -6.2203, 106.8012, 450),
-  (2, 'BCI BSD - Dropoff A', -6.1215, 106.7672, 600),
-  (3, 'Ancol Lobby Ecovention', -6.1199, 106.8355, 300),
-  (4, 'Ciputra Artpreneur Main Entrance', -6.2269, 106.8206, 120);
+    (1, 'GBK Main Gate Shuttle', -6.218600, 106.802700, 200),
+    (1, 'Plaza Senayan Pickup Point', -6.223500, 106.800500, 150),
+    (2, 'PIK Avenue Meeting Point', -6.119500, 106.725500, 100);
 
--- Sample check-in (crowded during concert night)
-INSERT INTO crowd_checkins (user_id, pickup_point_id, check_in_time) VALUES
-  ((SELECT id FROM users WHERE email = 'budi.wijaya@example.com'), 1, '2025-11-15 18:30:00+07'),
-  ((SELECT id FROM users WHERE email = 'sari.rahayu@example.com'), 3, '2025-12-05 19:00:00+07'),
-  ((SELECT id FROM users WHERE email = 'dimas.p@example.com'), 2, '2025-11-15 18:45:00+07');
+-- Crowd Checkins (3 sample check-ins)
+INSERT INTO crowd_checkins (id, user_id, pickup_point_id, check_in_time) VALUES
+    (gen_random_uuid(), (SELECT id FROM users LIMIT 1), 1, NOW()),
+    (gen_random_uuid(), (SELECT id FROM users LIMIT 1 OFFSET 1), 2, NOW()),
+    (gen_random_uuid(), (SELECT id FROM users LIMIT 1 OFFSET 2), 1, NOW());
 
--- 8. ITINERARIES (FR-07) - one complete example for end-to-end testing
-INSERT INTO itineraries (
-  id, user_id, ticket_id, hotel_id, hotel_check_in, hotel_check_out,
-  transport_to_venue, transport_from_venue, out_of_town_transport
-) VALUES (
-  gen_random_uuid(),
-  (SELECT id FROM users WHERE email = 'budi.wijaya@example.com'),
-  (SELECT id FROM tickets WHERE concert_id = 1 AND tier = 'Festival (Presale)' LIMIT 1),
-  (SELECT id FROM hotels WHERE name = 'Ashley Hotel Wahid Hasyim'),
-  '2025-11-15',
-  '2025-11-16',
-  (SELECT id FROM transport_routes WHERE route_name = 'MRT Red Line (Lebak Bulus - Bundaran HI)' LIMIT 1),
-  (SELECT id FROM transport_routes WHERE route_name = 'TransJakarta' LIMIT 1),
-  '{"provider": "Traveloka Pesawat", "flight_number": "QZ-812", "origin": "Surabaya (SUB)", "destination": "Jakarta (CGK)", "departure_date": "2025-11-15", "booking_code": "TLO-123XYZ"}'
-);
+-- 8. Hotel Bookings (3 rows)
+INSERT INTO hotel_bookings (user_id, hotel_id, check_in_date, check_out_date, status, created_at) VALUES
+    ((SELECT id FROM users LIMIT 1), 1, '2025-07-14', '2025-07-16', 'confirmed', NOW()),
+    ((SELECT id FROM users LIMIT 1 OFFSET 1), 2, '2025-08-19', '2025-08-21', 'pending', NOW()),
+    ((SELECT id FROM users LIMIT 1 OFFSET 2), 3, '2025-09-09', '2025-09-11', 'confirmed', NOW());
 
--- Add a second itinerary for a different user (Sari)
-INSERT INTO itineraries (
-  id, user_id, ticket_id, hotel_id, hotel_check_in, hotel_check_out,
-  transport_to_venue, out_of_town_transport
-) VALUES (
-  gen_random_uuid(),
-  (SELECT id FROM users WHERE email = 'sari.rahayu@example.com'),
-  (SELECT id FROM tickets WHERE concert_id = 3 AND tier = '2-Day Pass' LIMIT 1),
-  (SELECT id FROM hotels WHERE name = 'Pullman Jakarta Central Park'),
-  '2025-12-05',
-  '2025-12-07',
-  (SELECT id FROM transport_routes WHERE mode = 'MRT' AND origin_name LIKE '%Lebak Bulus%' LIMIT 1),
-  '{"provider": "KAI Access", "train": "Argo Bromo", "seat": "9A", "from": "Bandung", "to": "Jakarta Gambir", "date": "2025-12-05"}'
-);
+-- 9. Ticket Orders (3 rows)
+INSERT INTO ticket_orders (user_id, ticket_id, quantity, status, created_at) VALUES
+    ((SELECT id FROM users LIMIT 1), 1, 2, 'confirmed', NOW()),
+    ((SELECT id FROM users LIMIT 1 OFFSET 1), 4, 1, 'pending', NOW()),
+    ((SELECT id FROM users LIMIT 1 OFFSET 2), 7, 3, 'confirmed', NOW());
+
+-- 10. Intercity Transports (3 rows - arrivals from various Indonesian cities)
+INSERT INTO intercity_transports (user_id, origin_city, transport_mode, departure_date, return_date, status, created_at) VALUES
+    ((SELECT id FROM users LIMIT 1), 'Surabaya', 'Kereta Api Argo Semeru', '2025-07-15', '2025-07-16', 'confirmed', NOW()),
+    ((SELECT id FROM users LIMIT 1 OFFSET 1), 'Bali', 'Garuda Indonesia Flight', '2025-08-20', '2025-08-22', 'pending', NOW()),
+    ((SELECT id FROM users LIMIT 1 OFFSET 2), 'Yogyakarta', 'Bus DAMRI', '2025-09-10', '2025-09-12', 'confirmed', NOW());
+
+-- =====================================================
+-- VERIFICATION QUERIES (Optional - uncomment to test)
+-- =====================================================
+-- SELECT 'Users:' as Table, COUNT(*) as Rows FROM users UNION ALL
+-- SELECT 'Venues:', COUNT(*) FROM venues UNION ALL
+-- SELECT 'Concerts:', COUNT(*) FROM concerts UNION ALL
+-- SELECT 'Tickets:', COUNT(*) FROM tickets UNION ALL
+-- SELECT 'Hotels:', COUNT(*) FROM hotels UNION ALL
+-- SELECT 'Transport Routes:', COUNT(*) FROM transport_routes UNION ALL
+-- SELECT 'Pickup Points:', COUNT(*) FROM pickup_points UNION ALL
+-- SELECT 'Hotel Bookings:', COUNT(*) FROM hotel_bookings UNION ALL
+-- SELECT 'Ticket Orders:', COUNT(*) FROM ticket_orders UNION ALL
+-- SELECT 'Intercity Transports:', COUNT(*) FROM intercity_transports;
