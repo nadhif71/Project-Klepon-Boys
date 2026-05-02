@@ -13,6 +13,7 @@ import (
 type Claims struct {
 	UserID string `json:"user_id"`
 	Email  string `json:"email"`
+	Role   string `json:"role"`
 	jwt.RegisteredClaims
 }
 
@@ -39,7 +40,7 @@ func (s *AuthService) Login(ctx context.Context, email, password string) (string
 		return "", db.User{}, fmt.Errorf("invalid credentials")
 	}
 
-	token, err := s.GenerateToken(user.ID.String(), user.Email)
+	token, err := s.GenerateToken(user.ID.String(), user.Email, user.Role)
 	if err != nil {
 		return "", db.User{}, fmt.Errorf("failed to generate token")
 	}
@@ -47,7 +48,7 @@ func (s *AuthService) Login(ctx context.Context, email, password string) (string
 	return token, user, nil
 }
 
-func (s *AuthService) Register(ctx context.Context, email, password string) (string, db.User, error) {
+func (s *AuthService) Register(ctx context.Context, email, password, role string) (string, db.User, error) {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return "", db.User{}, fmt.Errorf("failed to hash password")
@@ -56,12 +57,13 @@ func (s *AuthService) Register(ctx context.Context, email, password string) (str
 	user, err := s.db.CreateUser(ctx, db.CreateUserParams{
 		Email:    email,
 		Password: string(hashedPassword),
+		Role:     role,
 	})
 	if err != nil {
 		return "", db.User{}, fmt.Errorf("user already exists")
 	}
 
-	token, err := s.GenerateToken(user.ID.String(), user.Email)
+	token, err := s.GenerateToken(user.ID.String(), user.Email, user.Role)
 	if err != nil {
 		return "", db.User{}, fmt.Errorf("failed to generate token")
 	}
@@ -69,15 +71,17 @@ func (s *AuthService) Register(ctx context.Context, email, password string) (str
 	return token, db.User{
 		ID:        user.ID,
 		Email:     user.Email,
+		Role:      user.Role,
 		CreatedAt: user.CreatedAt,
 	}, nil
 }
 
 // Generate JWT token
-func (s *AuthService) GenerateToken(userID, email string) (string, error) {
+func (s *AuthService) GenerateToken(userID, email, role string) (string, error) {
 	claims := Claims{
 		UserID: userID,
 		Email:  email,
+		Role:   role,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),

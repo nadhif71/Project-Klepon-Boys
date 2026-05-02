@@ -39,7 +39,7 @@ func (h *ItineraryHandler) CreateItinerary(c *gin.Context) {
 	}
 
 	params := service.ItineraryDB{
-		ConcertID:          dbItinerary.ConcertID,
+		TicketID:           dbItinerary.TicketID,
 		HotelID:            dbItinerary.HotelID,
 		TransportToVenue:   dbItinerary.TransportToVenue,
 		TransportFromVenue: dbItinerary.TransportFromVenue,

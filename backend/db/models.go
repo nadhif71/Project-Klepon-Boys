@@ -61,27 +61,57 @@ type Concert struct {
 	ID          int32
 	VenueID     sql.NullInt32
 	Title       string
+	ArtistName  string
 	EventDate   time.Time
 	Description sql.NullString
 }
 
+type CrowdCheckin struct {
+	ID            uuid.UUID
+	UserID        uuid.NullUUID
+	PickupPointID sql.NullInt32
+	CheckInTime   time.Time
+}
+
 type Hotel struct {
-	ID        int32
-	Name      string
-	Address   string
-	Latitude  sql.NullString
-	Longitude sql.NullString
-	PriceEst  sql.NullString
+	ID         int32
+	Name       string
+	Address    string
+	Latitude   string
+	Longitude  string
+	PriceEst   sql.NullString
+	StarRating sql.NullInt32
+	Facilities []string
 }
 
 type Itinerary struct {
 	ID                 uuid.UUID
 	UserID             uuid.NullUUID
-	ConcertID          sql.NullInt32
+	TicketID           sql.NullInt32
 	HotelID            sql.NullInt32
+	HotelCheckIn       sql.NullTime
+	HotelCheckOut      sql.NullTime
 	TransportToVenue   sql.NullInt32
 	TransportFromVenue sql.NullInt32
-	CreatedAt          sql.NullTime
+	OutOfTownTransport pqtype.NullRawMessage
+	CreatedAt          time.Time
+}
+
+type PickupPoint struct {
+	ID          int32
+	VenueID     sql.NullInt32
+	Name        string
+	Latitude    string
+	Longitude   string
+	MaxCapacity int32
+}
+
+type Ticket struct {
+	ID        int32
+	ConcertID sql.NullInt32
+	Tier      string
+	Price     string
+	Stock     int32
 }
 
 type TransportGeometry struct {
@@ -104,7 +134,8 @@ type User struct {
 	ID        uuid.UUID
 	Email     string
 	Password  string
-	CreatedAt sql.NullTime
+	Role      string
+	CreatedAt time.Time
 }
 
 type Venue struct {

@@ -15,6 +15,7 @@ type LoginRequest struct {
 type RegisterRequest struct {
 	Email    string `json:"email" binding:"required,email"`
 	Password string `json:"password" binding:"required,min=6"`
+	Role     string `json:"role"`
 }
 
 type AuthResponse struct {
@@ -25,6 +26,7 @@ type AuthResponse struct {
 type User struct {
 	ID    string `json:"id"`
 	Email string `json:"email"`
+	Role  string `json:"role"`
 }
 
 type AuthHandler struct {
@@ -56,6 +58,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		User: User{
 			ID:    dbUser.ID.String(),
 			Email: dbUser.Email,
+			Role:  dbUser.Role,
 		},
 	})
 }
@@ -67,7 +70,7 @@ func (h *AuthHandler) Register(c *gin.Context) {
 		return
 	}
 
-	token, dbUser, err := h.authService.Register(c, req.Email, req.Password)
+	token, dbUser, err := h.authService.Register(c, req.Email, req.Password, req.Role)
 	if err != nil {
 		if err.Error() == "user already exists" {
 			c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
@@ -82,6 +85,7 @@ func (h *AuthHandler) Register(c *gin.Context) {
 		User: User{
 			ID:    dbUser.ID.String(),
 			Email: dbUser.Email,
+			Role:  dbUser.Role,
 		},
 	})
 }

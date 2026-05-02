@@ -8,6 +8,7 @@ type Services struct {
 	Concert   *ConcertService
 	Route     *RouteService
 	Hotel     *HotelService
+	Ticket    *TiketService
 }
 
 func NewServices(queries *db.Queries, jwtSecret []byte) *Services {
@@ -17,5 +18,6 @@ func NewServices(queries *db.Queries, jwtSecret []byte) *Services {
 		Concert:   NewConcertService(queries),
 		Route:     NewRouteService(queries),
 		Hotel:     NewHotelServices(queries),
+		Ticket:    NewTiketService(queries),
 	}
 }

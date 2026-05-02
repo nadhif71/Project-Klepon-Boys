@@ -15,7 +15,7 @@ import (
 func main() {
 	godotenv.Load()
 
-	conn, err := sql.Open("postgres", "postgresql://admin:admin@localhost:5432/otintern?sslmode=disable")
+	conn, err := sql.Open("postgres", "postgresql://admin:admin@localhost:5432/otinternn?sslmode=disable")
 	if err != nil {
 		log.Fatal("cannot connect to db:", err)
 	}
