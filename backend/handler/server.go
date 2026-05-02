@@ -20,10 +20,12 @@ func NewServer(svcs *service.Services) *Server {
 	routeHandler := NewRouteHandler(svcs.Route)
 	hotelHandler := NewHotelHandler(svcs.Hotel)
 	tiketHandler := NewTicketHandler(svcs.Ticket)
+	intercityHandler := NewIntercityHandler(svcs.Intercity)
 
 	router := gin.Default()
 
 	router.GET("/hotels", hotelHandler.HotelLists)
+	router.GET("/hotels/:id", hotelHandler.GetHotel)
 	router.POST("/login", authHandler.Login)
 	router.POST("/register", authHandler.Register)
 	router.GET("/concerts", concertHandler.UpcomingConcerts)
@@ -37,6 +39,10 @@ func NewServer(svcs *service.Services) *Server {
 	{
 		protected.POST("/ticketorders", tiketHandler.CreateTicketOrder)
 		protected.GET("/ticketorders", tiketHandler.GetTicketOrdersByUser)
+		protected.POST("/hotelbookings", hotelHandler.CreateHotelBooking)
+		protected.GET("/hotelbookings", hotelHandler.GetHotelBookingsByUser)
+		protected.POST("/intercities", intercityHandler.CreateIntercityTransport)
+		protected.GET("/intercities", intercityHandler.GetIntercityTransportsByUser)
 	}
 
 	server.router = router

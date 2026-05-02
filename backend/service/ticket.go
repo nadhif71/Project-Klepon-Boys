@@ -42,7 +42,7 @@ func (s *TiketService) UpdateTicketStock(ctx context.Context, ticket_id, amount 
 }
 
 func (s *TiketService) CreateTicketOrder(ctx context.Context, user_id any, ticket_id, quantity int, status string) (db.CreateTicketOrderRow, error) {
-	userId, err := stringToNullUUID(user_id)
+	userId, err := StringToNullUUID(user_id)
 	if err != nil {
 		return db.CreateTicketOrderRow{}, err
 	}
@@ -59,7 +59,7 @@ func (s *TiketService) CreateTicketOrder(ctx context.Context, user_id any, ticke
 }
 
 func (s *TiketService) GetTicketOrdersByUser(ctx context.Context, user_id any) ([]db.GetTicketOrdersByUserRow, error) {
-	userId, err := stringToNullUUID(user_id)
+	userId, err := StringToNullUUID(user_id)
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +68,7 @@ func (s *TiketService) GetTicketOrdersByUser(ctx context.Context, user_id any) (
 	return res, err
 }
 
-func stringToNullUUID(userIDInterface any) (uuid.NullUUID, error) {
+func StringToNullUUID(userIDInterface any) (uuid.NullUUID, error) {
 	userIDStr, ok := userIDInterface.(string)
 	if !ok {
 		return uuid.NullUUID{}, fmt.Errorf("stringToNullUUID: expected string, got %T", userIDInterface)
