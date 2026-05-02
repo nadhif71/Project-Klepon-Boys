@@ -47,6 +47,7 @@ func (h *HotelHandler) CreateHotelBooking(c *gin.Context) {
 	userId, exist := c.Get("user_id")
 	if exist == false {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "login dulu"})
+		return
 	}
 
 	res, err := h.hotelService.CreateHotelBooking(c, userId, req.HotelID, req.CheckInDate, req.CheckOutDate, req.Status)

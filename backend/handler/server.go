@@ -22,6 +22,7 @@ func NewServer(svcs *service.Services) *Server {
 	tiketHandler := NewTicketHandler(svcs.Ticket)
 	intercityHandler := NewIntercityHandler(svcs.Intercity)
 	pickupHandler := NewPickupHandler(svcs.Pickup)
+	dashboardHandler := NewDashboardHandler(svcs.Dashboard)
 
 	router := gin.Default()
 
@@ -46,6 +47,7 @@ func NewServer(svcs *service.Services) *Server {
 		protected.POST("/intercities", intercityHandler.CreateIntercityTransport)
 		protected.GET("/intercities", intercityHandler.GetIntercityTransportsByUser)
 		protected.POST("/crowdcheckins", pickupHandler.CreateCrowdCheckin)
+		protected.GET("/dashboard", dashboardHandler.GetUserDashboard)
 	}
 
 	server.router = router

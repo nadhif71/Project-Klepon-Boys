@@ -27,6 +27,7 @@ func (h *IntercityHandler) CreateIntercityTransport(c *gin.Context) {
 	user_id, exist := c.Get("user_id")
 	if exist == false {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "login dulu"})
+		return
 	}
 
 	res, err := h.intercityService.CreateIntercityTransport(c, req.OriginCity, req.TransportMode, req.Status, req.DepartureDate, req.ReturnDate, user_id)
@@ -41,6 +42,7 @@ func (h *IntercityHandler) GetIntercityTransportsByUser(c *gin.Context) {
 	user_id, exist := c.Get("user_id")
 	if exist == false {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "login dulu"})
+		return
 	}
 
 	res, err := h.intercityService.GetIntercityTransportByUser(c, user_id)

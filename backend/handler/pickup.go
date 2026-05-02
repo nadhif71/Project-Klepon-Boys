@@ -44,6 +44,7 @@ func (h *PickupHandler) CreateCrowdCheckin(c *gin.Context) {
 	userId, exist := c.Get("user_id")
 	if exist == false {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "login dulu"})
+		return
 	}
 
 	res, err := h.pickupService.CreateCrowdCheckin(c, userId, req.PickupPointId)

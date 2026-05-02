@@ -47,6 +47,18 @@ func (s *TiketService) CreateTicketOrder(ctx context.Context, user_id any, ticke
 		return db.CreateTicketOrderRow{}, err
 	}
 
+	stockParams := db.UpdateTicketStockParams{
+		ID:    int32(ticket_id),
+		Stock: int32(quantity),
+	}
+	_, err = s.db.UpdateTicketStock(ctx, stockParams)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return db.CreateTicketOrderRow{}, fmt.Errorf("insufficient stock or ticket not found")
+		}
+		return db.CreateTicketOrderRow{}, err
+	}
+
 	ticketId := sql.NullInt32{Int32: int32(ticket_id), Valid: true}
 	req := db.CreateTicketOrderParams{
 		UserID:   userId,
