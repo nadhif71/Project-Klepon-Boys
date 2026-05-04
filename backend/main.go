@@ -14,8 +14,9 @@ import (
 
 func main() {
 	godotenv.Load()
+	dbConnString := os.Getenv("DB_CONNECTION_STRING")
 
-	conn, err := sql.Open("postgres", "postgresql://admin:admin@localhost:5432/otinternn?sslmode=disable")
+	conn, err := sql.Open("postgres", dbConnString)
 	if err != nil {
 		log.Fatal("cannot connect to db:", err)
 	}
@@ -27,7 +28,12 @@ func main() {
 	svcs := service.NewServices(queries, jwtSecret)
 	server := handler.NewServer(svcs)
 
-	err = server.Start(":8080")
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+
+	err = server.Start(":" + port)
 	if err != nil {
 		log.Fatal("cannot start server:", err)
 	}

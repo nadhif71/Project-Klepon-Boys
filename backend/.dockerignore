@@ -1,0 +1,8 @@
+.env
+.git
+bin
+*.exe
+docker-compose.yml
+docker-compose-old.yml
+notes.md
+README.md

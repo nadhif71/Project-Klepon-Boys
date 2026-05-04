@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/nadhif71/Project-Klepon-Boys/service"
 )
@@ -25,6 +26,7 @@ func NewServer(svcs *service.Services) *Server {
 	dashboardHandler := NewDashboardHandler(svcs.Dashboard)
 
 	router := gin.Default()
+	router.Use(cors.Default())
 
 	router.GET("/hotels", hotelHandler.HotelLists)
 	router.GET("/hotels/:id", hotelHandler.GetHotel)
