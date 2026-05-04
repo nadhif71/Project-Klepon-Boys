@@ -14,6 +14,8 @@ Welcome to the backend documentation for **Project Klepon Boys**! This is a Go-b
 
 ## Getting Started
 
+backend base url = otintern.vercel.app
+
 ### 1. Prerequisites
 - Go installed on your machine.
 - PostgreSQL running locally.

@@ -56,6 +56,10 @@ func NewServer(svcs *service.Services) *Server {
 	return server
 }
 
+func (s *Server) Router() *gin.Engine {
+	return s.router
+}
+
 func (server *Server) Start(address string) error {
 	return server.router.Run(address)
 }
