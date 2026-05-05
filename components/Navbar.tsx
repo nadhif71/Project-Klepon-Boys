@@ -14,17 +14,17 @@ export const Navbar = () => {
           </span>
         </Link>
         
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-3 sm:gap-6">
           <Link
             href="/dashboard"
-            className="hidden sm:flex items-center gap-2 rounded-2xl border-2 border-main-gray bg-white px-5 py-2.5 text-[10px] font-black uppercase tracking-[0.2em] text-main-darkbrown hover:border-main-gold transition-all duration-300"
+            className="flex items-center gap-2 rounded-2xl border-2 border-main-gray bg-white px-3 sm:px-5 py-2 sm:py-2.5 text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-main-darkbrown hover:border-main-gold transition-all duration-300"
           >
             Dashboard
           </Link>
           
-          <Link href="/login" className="h-12 w-12 rounded-2xl border-2 border-main-gray bg-main-white p-0.5 overflow-hidden cursor-pointer hover:border-main-gold transition-colors duration-300 shadow-sm group">
+          <Link href="/login" className="h-10 w-10 sm:h-12 sm:w-12 rounded-2xl border-2 border-main-gray bg-main-white p-0.5 overflow-hidden cursor-pointer hover:border-main-gold transition-colors duration-300 shadow-sm group">
             <div className="h-full w-full rounded-[14px] bg-main-cream flex items-center justify-center text-main-gold relative overflow-hidden">
-               <svg className="h-7 w-7 relative z-10" fill="currentColor" viewBox="0 0 24 24">
+               <svg className="h-6 w-6 sm:h-7 sm:w-7 relative z-10" fill="currentColor" viewBox="0 0 24 24">
                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
                </svg>
             </div>

@@ -6,8 +6,8 @@ import React from 'react';
 
 const steps = [
   { name: 'Tiket', path: '/plan/ticket' },
-  { name: 'Ke Jakarta', path: '/plan/transport-to' },
-  { name: 'Hotel', path: '/plan/hotel' },
+  { name: 'Transport', path: '/plan/transport-to' },
+  { name: 'Akomodasi', path: '/plan/hotel' },
   { name: 'Ke Venue', path: '/plan/local-to-venue' },
   { name: 'Ke Hotel', path: '/plan/local-to-hotel' },
   { name: 'Pulang', path: '/plan/transport-from' },
@@ -26,45 +26,46 @@ export default function PlanLayout({ children }: { children: React.ReactNode }) 
         <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
           <div className="absolute top-0 left-0 w-full h-[600px] bg-gradient-to-b from-main-gold/5 via-white to-white"></div>
           <div className="absolute top-[20%] -right-[10%] w-[400px] h-[400px] rounded-full bg-main-yellow/10 blur-[100px]"></div>
-          <div className="absolute bottom-0 left-[10%] w-[300px] h-[300px] rounded-full bg-main-gold/5 blur-[80px]"></div>
         </div>
 
-        <div className="mx-auto max-w-2xl">
-          {/* Progress Bar */}
-          <nav aria-label="Progress" className="mb-12">
-            <ol role="list" className="flex items-center justify-between gap-2">
+        <div className="mx-auto max-w-2xl font-avenir">
+          {/* Refined Progress Bar */}
+          <nav aria-label="Progress" className="mb-20">
+            <ol role="list" className="flex items-center justify-between gap-1 sm:gap-2">
               {steps.map((step, index) => (
-                <li key={step.name} className={`${index !== steps.length - 1 ? 'flex-1' : ''} relative flex items-center`}>
-                  <div
-                    className={`relative flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border-2 transition-all duration-300 ${
-                      index < currentStepIndex
-                        ? 'border-main-gold bg-main-gold text-white'
-                        : index === currentStepIndex
-                        ? 'border-main-gold bg-main-yellow text-main-darkbrown scale-110 shadow-lg shadow-main-yellow/20'
-                        : 'border-main-gray bg-white text-main-gray'
-                    }`}
-                  >
-                    {index < currentStepIndex ? (
-                      <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                      </svg>
-                    ) : (
-                      <span className="text-sm font-bold">{index + 1}</span>
+                <li key={step.name} className={`${index !== steps.length - 1 ? 'flex-1' : ''} relative flex flex-col items-center`}>
+                  <div className="flex items-center w-full">
+                    <div
+                      className={`relative flex h-8 w-8 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-xl border-2 transition-all duration-300 ${
+                        index < currentStepIndex
+                          ? 'border-main-gold bg-main-gold text-white'
+                          : index === currentStepIndex
+                          ? 'border-main-gold bg-main-yellow text-main-darkbrown shadow-lg shadow-main-yellow/20 scale-110'
+                          : 'border-main-gray bg-white text-main-gray'
+                      }`}
+                    >
+                      {index < currentStepIndex ? (
+                        <svg className="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                        </svg>
+                      ) : (
+                        <span className="text-[10px] sm:text-xs font-black italic">{index + 1}</span>
+                      )}
+                    </div>
+                    
+                    {index !== steps.length - 1 && (
+                      <div
+                        className={`h-0.5 sm:h-1 w-full mx-1 sm:mx-2 rounded-full transition-colors duration-500 ${
+                          index < currentStepIndex ? 'bg-main-gold' : 'bg-main-gray/30'
+                        }`}
+                      />
                     )}
                   </div>
-                  
-                  {index !== steps.length - 1 && (
-                    <div
-                      className={`h-1 w-full mx-2 rounded-full transition-colors duration-500 ${
-                        index < currentStepIndex ? 'bg-main-gold' : 'bg-main-gray/30'
-                      }`}
-                    />
-                  )}
 
-                  {/* Step label for Desktop */}
-                  <div className="absolute -bottom-7 left-0 hidden lg:block whitespace-nowrap">
-                    <span className={`text-[10px] font-black uppercase tracking-widest ${
-                      index === currentStepIndex ? 'text-main-gold' : 'text-main-darkbrown/30'
+                  {/* Step label for Desktop - Using smaller text and more spacing to avoid overlap */}
+                  <div className="absolute top-12 left-1/2 -translate-x-1/2 hidden md:block w-24 text-center">
+                    <span className={`text-[7px] font-black uppercase tracking-widest leading-tight block ${
+                      index === currentStepIndex ? 'text-main-gold' : 'text-main-darkbrown/20'
                     }`}>
                       {step.name}
                     </span>
@@ -72,10 +73,17 @@ export default function PlanLayout({ children }: { children: React.ReactNode }) 
                 </li>
               ))}
             </ol>
+            
+            {/* Current Step Label for Mobile */}
+            <div className="mt-10 text-center md:hidden">
+              <span className="text-[9px] font-black uppercase tracking-[0.3em] text-main-gold bg-main-gold/5 px-6 py-2 rounded-full border border-main-gold/20 italic">
+                Step {currentStepIndex + 1}: {steps[currentStepIndex]?.name}
+              </span>
+            </div>
           </nav>
 
           {/* Page Content */}
-          <div className="rounded-3xl bg-main-white p-8 shadow-xl shadow-main-darkbrown/5 sm:p-12">
+          <div className="rounded-3xl bg-main-white p-8 shadow-xl shadow-main-darkbrown/5 sm:p-12 font-sans">
             {children}
           </div>
         </div>

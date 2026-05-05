@@ -1,12 +1,13 @@
 export type TransportType = 'plane' | 'train' | 'bus' | 'other' | 'none';
-
 export interface ConcertPlan {
   id: string;
   concertName: string;
   concertDate: string;
   location: string;
-  
+  origin?: string;
+
   // Step 1: Ticket
+...
   ticketStatus: 'booked' | 'none';
   ticketPrice?: number;
 
