@@ -1,17 +1,71 @@
 @import "tailwindcss";
 
+/* 1. Standard CSS variables (VS Code WILL show color previews here) */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* --- PALET UTAMA --- */
+  --raw-main-cream: #FFF7D4;
+  --raw-main-yellow: #FFD95A;
+  --raw-main-gold: #C07F00;
+  --raw-main-darkbrown: #4C3D3D;
+  --raw-main-white: #FFFFFF;
+  --raw-main-gray: #E0E0E0;
+  --raw-main-dark: #000000;
+
+  /* --- PALET NETRAL (Warm Grays) --- */
+  --raw-neutral-50: #fafaf9;
+  --raw-neutral-100: #f5f5f4;
+  --raw-neutral-200: #e7e5e4;
+  --raw-neutral-300: #d6d3d1;
+  --raw-neutral-400: #a8a29e;
+  --raw-neutral-500: #78716c;
+  --raw-neutral-600: #57534e;
+  --raw-neutral-700: #44403c;
+  --raw-neutral-800: #292524;
+  --raw-neutral-900: #1c1917;
+
+  /* --- WARNA ASOSIASI / AKSEN --- */
+  --raw-accent-blue: #2B4C7E;
+  --raw-accent-teal: #569DAA;
+  --raw-accent-green: #4E9F3D;
+  --raw-accent-red: #D21312;
 }
 
+/* 2. Map the standard variables to Tailwind's utility system */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* --- PALET UTAMA --- */
+  --color-main-cream: var(--raw-main-cream);
+  --color-main-yellow: var(--raw-main-yellow);
+  --color-main-gold: var(--raw-main-gold);
+  --color-main-darkbrown: var(--raw-main-darkbrown);
+  --color-main-white: var(--raw-main-white);
+  --color-main-gray: var(--raw-main-gray);
+  --color-main-dark: var(--raw-main-dark);
+
+  /* --- PALET NETRAL --- */
+  --color-neutral-50: var(--raw-neutral-50);
+  --color-neutral-100: var(--raw-neutral-100);
+  --color-neutral-200: var(--raw-neutral-200);
+  --color-neutral-300: var(--raw-neutral-300);
+  --color-neutral-400: var(--raw-neutral-400);
+  --color-neutral-500: var(--raw-neutral-500);
+  --color-neutral-600: var(--raw-neutral-600);
+  --color-neutral-700: var(--raw-neutral-700);
+  --color-neutral-800: var(--raw-neutral-800);
+  --color-neutral-900: var(--raw-neutral-900);
+
+  /* --- WARNA ASOSIASI / AKSEN --- */
+  --color-accent-blue: var(--raw-accent-blue);
+  --color-accent-teal: var(--raw-accent-teal);
+  --color-accent-green: var(--raw-accent-green);
+  --color-accent-red: var(--raw-accent-red);
 }
 
+/* Dark mode preferences */
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
@@ -19,8 +73,9 @@
   }
 }
 
+/* Base styles */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  /* Use the raw variables here so standard CSS can apply them reliably */
+  background-color: var(--raw-main-white);
+  color: var(--raw-main-dark);
 }
