@@ -7,7 +7,6 @@ export interface ConcertPlan {
   origin?: string;
 
   // Step 1: Ticket
-...
   ticketStatus: 'booked' | 'none';
   ticketPrice?: number;
 

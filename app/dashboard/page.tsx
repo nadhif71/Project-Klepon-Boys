@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { usePlan } from '@/context/PlanContext';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
@@ -18,6 +18,21 @@ type DetailModalInfo = {
 export default function DashboardPage() {
   const { plans } = usePlan();
   const [selectedDetail, setSelectedDetail] = useState<DetailModalInfo | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <div className="flex min-h-screen flex-col bg-neutral-50/50">
+        <Navbar />
+        <main className="flex-1" />
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen flex-col bg-neutral-50/50">
@@ -87,7 +102,7 @@ export default function DashboardPage() {
                           </div>
                           <div className="text-center">
                             <p className="text-[10px] font-bold uppercase tracking-widest text-main-darkbrown/40">Booking Number</p>
-                            <p className="text-2xl font-bold text-main-darkbrown tracking-widest uppercase mt-1">TRV-{Math.random().toString(36).substring(2, 8).toUpperCase()}</p>
+                            <p className="text-2xl font-bold text-main-darkbrown tracking-widest uppercase mt-1">TRV-BK829X</p>
                           </div>
                        </div>
                        
@@ -127,12 +142,12 @@ export default function DashboardPage() {
                        <div className="flex flex-col items-center bg-main-gold/5 rounded-3xl p-8 border-2 border-main-gold/20">
                           <div className="w-full h-20 flex items-center justify-center gap-1.5 mb-6 px-4">
                              {[...Array(30)].map((_, i) => (
-                               <div key={i} className={`w-1.5 bg-main-darkbrown rounded-full ${Math.random() > 0.4 ? 'h-full' : 'h-1/2'}`}></div>
+                               <div key={i} className={`w-1.5 bg-main-darkbrown rounded-full ${i % 3 === 0 ? 'h-full' : 'h-1/2'}`}></div>
                              ))}
                           </div>
                           <div className="text-center">
                             <p className="text-[10px] font-bold uppercase tracking-widest text-main-darkbrown/40">Hotel Booking ID</p>
-                            <p className="text-2xl font-bold text-main-darkbrown tracking-widest uppercase mt-1">HTL-{Math.random().toString(36).substring(2, 8).toUpperCase()}</p>
+                            <p className="text-2xl font-bold text-main-darkbrown tracking-widest uppercase mt-1">HTL-QS2911</p>
                           </div>
                        </div>
 
