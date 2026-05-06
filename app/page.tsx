@@ -80,7 +80,7 @@ export default function Home() {
     { name: "KAI Argo Bromo", img: "/images/argobromo.webp", price: "Starts Rp 600k", info: "Train • Executive", type: 'train', desc: "Kereta api eksekutif dengan pemandangan indah sepanjang pulau Jawa. Tepat waktu dan nyaman." },
     { name: "Citilink Airline", img: "/images/citilink.webp", price: "Starts Rp 800k", info: "Flight • Economy", type: 'plane', desc: "Penerbangan ekonomis dengan armada modern. Cara cerdas dan cepat untuk sampai ke lokasi konser." },
     { name: "KAI Taksaka", img: "/images/taksaka.webp", price: "Starts Rp 550k", info: "Train • Executive", type: 'train', desc: "Layanan kereta malam eksklusif dengan fasilitas lengkap. Istirahat maksimal, sampai di Jakarta dengan segar." },
-    { name: "Batik Air Business", img: "/images/batik-air.webp", price: "Starts Rp 1.5M", info: "Flight • Premium", type: 'plane', desc: "Terbang dengan gaya eksekutif bersama Batik Air. Ruang kaki luas dan hidangan lezat menemani perjalanan Anda." },
+    { name: "Batik Air Business", img: "/images/batikair.webp", price: "Starts Rp 1.5M", info: "Flight • Premium", type: 'plane', desc: "Terbang dengan gaya eksekutif bersama Batik Air. Ruang kaki luas dan hidangan lezat menemani perjalanan Anda." },
     { name: "KAI Argo Lawu", img: "/images/argolawu.webp", price: "Starts Rp 620k", info: "Train • Luxury", type: 'train', desc: "Salah satu kereta legendaris di Indonesia. Menawarkan kecepatan dan kenyamanan kelas atas untuk rute favorit." },
   ];
 
