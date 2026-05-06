@@ -13,6 +13,7 @@ export default function HotelPage() {
     currentPlan?.hotel?.name ? { name: currentPlan.hotel.name, price: '', area: '' } : null
   );
   const [checkIn, setCheckIn] = useState(currentPlan?.hotel?.checkIn || '');
+  const [checkOut, setCheckOut] = useState(currentPlan?.hotel?.checkOut || '');
 
   const handleNext = (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,6 +24,7 @@ export default function HotelPage() {
         name: selectedHotel.name,
         bookingStatus: 'booked',
         checkIn,
+        checkOut,
       },
     });
     router.push('/plan/local-to-venue');
@@ -37,9 +39,9 @@ export default function HotelPage() {
   ];
 
   return (
-    <div className="space-y-10 text-left">
+    <div className="space-y-10 text-left font-avenir">
       <div>
-        <h2 className="text-3xl font-black text-main-darkbrown italic uppercase tracking-tighter">Akomodasi</h2>
+        <h2 className="text-3xl font-bold text-main-darkbrown uppercase tracking-tighter">Akomodasi</h2>
         <p className="mt-3 text-[10px] font-bold text-main-darkbrown/40 uppercase tracking-widest leading-relaxed">
           Pilih penginapan terbaik via <span className="text-main-gold">Traveloka</span>.
         </p>
@@ -48,8 +50,8 @@ export default function HotelPage() {
       <form onSubmit={handleNext} className="space-y-10">
         <div className="space-y-8 animate-in fade-in duration-500">
           <div className="flex items-center justify-between border-b-2 border-main-gray pb-4 mb-6">
-            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-main-darkbrown/40">Rekomendasi Penginapan</label>
-            <span className="text-[8px] font-black uppercase bg-[#0194f3] text-white px-3 py-1 rounded-full italic">Powered by Traveloka</span>
+            <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-main-darkbrown/40">Rekomendasi Penginapan</label>
+            <span className="text-[8px] font-bold uppercase bg-[#0194f3] text-white px-3 py-1 rounded-full">Powered by Traveloka</span>
           </div>
 
           <div className="grid grid-cols-1 gap-3">
@@ -66,23 +68,23 @@ export default function HotelPage() {
                >
                  <div className="text-left">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="text-[11px] font-black uppercase tracking-widest italic">{hotel.name}</span>
-                      <span className="text-[7px] font-black text-main-gold italic">★ {hotel.rating}</span>
+                      <span className="text-[11px] font-bold uppercase tracking-widest">{hotel.name}</span>
+                      <span className="text-[7px] font-bold text-main-gold">★ {hotel.rating}</span>
                     </div>
                     <span className="block text-[9px] font-bold opacity-40 uppercase tracking-[0.2em]">{hotel.area}</span>
                  </div>
                  <div className="text-right">
-                    <span className="block text-[12px] font-black text-main-darkbrown tracking-tight">{hotel.price}</span>
-                    <span className="block text-[7px] font-black opacity-30 uppercase tracking-widest mt-1">per night</span>
+                    <span className="block text-[12px] font-bold text-main-darkbrown tracking-tight">{hotel.price}</span>
+                    <span className="block text-[7px] font-bold opacity-30 uppercase tracking-widest mt-1">per night</span>
                  </div>
                </button>
              ))}
           </div>
         </div>
 
-        <div className="space-y-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div className="space-y-4">
-            <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-main-darkbrown/40 ml-1">Tanggal Check-in</label>
+            <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-main-darkbrown/40 ml-1">Check-in</label>
             <input
               type="date"
               required
@@ -91,21 +93,31 @@ export default function HotelPage() {
               onChange={(e) => setCheckIn(e.target.value)}
             />
           </div>
+          <div className="space-y-4">
+            <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-main-darkbrown/40 ml-1">Check-out</label>
+            <input
+              type="date"
+              required
+              className="w-full rounded-2xl border-2 border-main-gray bg-transparent px-5 py-4 text-main-darkbrown font-bold focus:border-main-gold focus:outline-none transition-colors placeholder:text-main-darkbrown/10 uppercase tracking-widest text-xs"
+              value={checkOut}
+              onChange={(e) => setCheckOut(e.target.value)}
+            />
+          </div>
         </div>
 
         <div className="flex gap-4 pt-6">
           <Button
             type="button"
             variant="outline"
-            className="flex-1 rounded-2xl border-main-gray h-16 text-[10px] font-black uppercase tracking-widest"
+            className="flex-1 rounded-2xl border-main-gray h-16 text-[10px] font-bold uppercase tracking-widest"
             onClick={() => router.back()}
           >
             Back
           </Button>
           <Button 
             type="submit" 
-            disabled={!selectedHotel || !checkIn} 
-            className="flex-[2] rounded-2xl h-16 text-[10px] font-black uppercase tracking-widest shadow-xl shadow-main-darkbrown/10"
+            disabled={!selectedHotel || !checkIn || !checkOut} 
+            className="flex-[2] rounded-2xl h-16 text-[10px] font-bold uppercase tracking-widest shadow-xl shadow-main-darkbrown/10"
           >
             Next Step
           </Button>

@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect, useRef } from 'react';
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/Button";
@@ -8,267 +9,296 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { usePlan } from "@/context/PlanContext";
 
+type PopupInfo = {
+  title: string;
+  desc: string;
+  price: string;
+  location: string;
+  images: string[];
+  type: 'concert' | 'transport' | 'hotel';
+};
+
+// Scroll Animation Wrapper Component
+const ScrollReveal = ({ children }: { children: React.ReactNode }) => {
+  const [isVisible, setIsVisible] = useState(false);
+  const domRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    
+    if (domRef.current) observer.observe(domRef.current);
+    
+    return () => {
+      if (domRef.current) observer.unobserve(domRef.current);
+    };
+  }, []);
+
+  return (
+    <div
+      ref={domRef}
+      className={`transition-all duration-1000 transform ${
+        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
+      }`}
+    >
+      {children}
+    </div>
+  );
+};
+
 export default function Home() {
   const router = useRouter();
   const { updateCurrentPlan } = usePlan();
+  const [activePopup, setActivePopup] = useState<PopupInfo | null>(null);
 
   const handleConcertSelect = (name: string, location: string) => {
-    updateCurrentPlan({
-      concertName: name,
-      location: location,
-      ticketStatus: 'booked',
-    });
-    router.push('/plan/ticket');
-  };
-
-  const handleTransportSelect = (type: any, details: string) => {
-    updateCurrentPlan({
-      transportTo: { type, bookingStatus: 'booked', details }
+    updateCurrentPlan({ 
+      concertName: name, 
+      location: location, 
+      ticketStatus: 'booked' 
     });
     router.push('/plan/transport-to');
   };
 
-  const handleHotelSelect = (name: string) => {
-    updateCurrentPlan({
-      hotel: { name, bookingStatus: 'booked' }
-    });
-    router.push('/plan/hotel');
-  };
+  const trendingConcerts = [
+    { name: "LANY - Jakarta", img: "/images/lany.webp", price: "Rp 1.500.000", info: "Stadium GBK", date: "Nov 2026", desc: "Tur dunia 'a beautiful blur' dari LANY kini hadir di Jakarta. Jangan lewatkan pengalaman konser synth-pop yang tak terlupakan." },
+    { name: "Keshi: Requiem Tour", img: "/images/keshi.webp", price: "Rp 1.800.000", info: "Istora Senayan", date: "Dec 2026", desc: "Keshi kembali ke Jakarta dengan tur album terbarunya, Requiem. Rasakan nuansa lo-fi hip-hop yang melankolis dan intim." },
+    { name: "Coldplay Spheres", img: "/images/coldplay.webp", price: "Rp 3.000.000", info: "GBK Jakarta", date: "Jan 2027", desc: "Konser ramah lingkungan dengan visual spektakuler. Jadilah bagian dari sejarah tur Music of the Spheres." },
+    { name: "Fuji Kaze: Best of Tour", img: "/images/fujikaze.webp", price: "Rp 2.100.000", info: "JIS Jakarta", date: "Oct 2026", desc: "Bintang berbakat dari Jepang, Fuji Kaze, akan membawa lagu-lagu hitsnya ke Jakarta dalam panggung yang megah." },
+    { name: "NIKI: Buzz Tour", img: "/images/niki.webp", price: "Rp 1.200.000", info: "Beach City Intl Stadium", date: "Feb 2027", desc: "Putri kebanggaan Indonesia kembali pulang. Nikmati lagu-lagu emosional dari album terbarunya, Buzz." },
+    { name: "Daniel Caesar: Superpowers", img: "/images/daniel-caesar.webp", price: "Rp 1.950.000", info: "Ancol Jakarta", date: "Mar 2027", desc: "Pemenang Grammy, Daniel Caesar, siap meluluhkan hati penggemarnya di Jakarta dengan vokal soul yang memukau." },
+  ];
+
+  const travelPartners = [
+    { name: "Garuda Indonesia", img: "/images/garuda.webp", price: "Starts Rp 1.2M", info: "Flight • Priority", type: 'plane', desc: "Maskapai bintang 5 dengan pelayanan premium. Nikmati kenyamanan perjalanan udara terbaik menuju Jakarta." },
+    { name: "KAI Argo Bromo", img: "/images/argobromo.webp", price: "Starts Rp 600k", info: "Train • Executive", type: 'train', desc: "Kereta api eksekutif dengan pemandangan indah sepanjang pulau Jawa. Tepat waktu dan nyaman." },
+    { name: "Citilink Airline", img: "/images/citilink.webp", price: "Starts Rp 800k", info: "Flight • Economy", type: 'plane', desc: "Penerbangan ekonomis dengan armada modern. Cara cerdas dan cepat untuk sampai ke lokasi konser." },
+    { name: "KAI Taksaka", img: "/images/taksaka.webp", price: "Starts Rp 550k", info: "Train • Executive", type: 'train', desc: "Layanan kereta malam eksklusif dengan fasilitas lengkap. Istirahat maksimal, sampai di Jakarta dengan segar." },
+    { name: "Batik Air Business", img: "/images/batik-air.webp", price: "Starts Rp 1.5M", info: "Flight • Premium", type: 'plane', desc: "Terbang dengan gaya eksekutif bersama Batik Air. Ruang kaki luas dan hidangan lezat menemani perjalanan Anda." },
+    { name: "KAI Argo Lawu", img: "/images/argolawu.webp", price: "Starts Rp 620k", info: "Train • Luxury", type: 'train', desc: "Salah satu kereta legendaris di Indonesia. Menawarkan kecepatan dan kenyamanan kelas atas untuk rute favorit." },
+  ];
+
+  const hotels = [
+    { name: "The Ritz-Carlton", price: "Rp 4.500.000", info: "5 Star • Kuningan", bestChoice: true, images: [], desc: "Kemewahan tiada tara di jantung kota Jakarta. Fasilitas kelas dunia dan layanan personal yang luar biasa.", img1: "/images/hotel1.webp", img2: "/images/room1.webp", img3: "/images/pool1.webp" },
+    { name: "Fairmont Jakarta", price: "Rp 3.800.000", info: "5 Star • Senayan", bestChoice: true, images: [], desc: "Lokasi paling strategis untuk konser di GBK. Akses langsung dan pemandangan lapangan golf yang ikonik.", img1: "/images/hotel1.webp", img2: "/images/room1.webp", img3: "/images/pool1.webp" },
+    { name: "Hotel Kempinski", price: "Rp 5.200.000", info: "5 Star • HI", bestChoice: false, images: [], desc: "Hotel bersejarah dengan sentuhan modern. Berada di pusat Jakarta dengan akses mudah ke seluruh moda transportasi.", img1: "/images/hotel1.webp", img2: "/images/room1.webp", img3: "/images/pool1.webp" },
+    { name: "Artotel GBK", price: "Rp 1.200.000", info: "4 Star • Senayan", bestChoice: false, images: [], desc: "Hotel gaya hidup dengan desain artistik. Pilihan tepat untuk penggemar musik yang mencari suasana kreatif.", img1: "/images/hotel1.webp", img2: "/images/room1.webp", img3: "/images/pool1.webp" },
+    { name: "Park Hyatt Jakarta", price: "Rp 4.800.000", info: "5 Star • Menteng", bestChoice: false, images: [], desc: "Hotel ultra-mewah dengan desain modern elegan. Menawarkan kenyamanan tingkat tinggi di lokasi prestisius Menteng.", img1: "/images/hyatt1.webp", img2: "/images/room1.webp", img3: "/images/pool1.webp" },
+    { name: "The Langham Jakarta", price: "Rp 5.500.000", info: "5 Star • SCBD", bestChoice: true, images: [], desc: "Standar baru kemewahan di Jakarta. Terletak di pusat bisnis elite dengan fasilitas spa dan restoran kelas dunia.", img1: "/images/langham1.webp", img2: "/images/room1.webp", img3: "/images/pool1.webp" },
+  ];
 
   return (
-    <div className="flex flex-col min-h-screen selection:bg-main-gold/30 bg-white">
+    <div className="flex flex-col min-h-screen selection:bg-main-gold/30 bg-white font-avenir">
       <Navbar />
       
       <main className="flex-1 relative">
-        {/* Unique Background Design */}
-        <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
-          <div className="absolute top-0 right-0 w-full h-[800px] bg-gradient-to-b from-main-gold/5 via-white to-white"></div>
-          <div className="absolute top-[10%] -left-[10%] w-[500px] h-[500px] rounded-full bg-main-yellow/5 blur-[120px]"></div>
-          <div className="absolute inset-0 opacity-[0.02]" style={{ backgroundImage: 'radial-gradient(var(--raw-main-gold) 1px, transparent 1px)', backgroundSize: '32px 32px' }}></div>
-        </div>
-
-        {/* Full Width Carousel Section */}
         <section className="w-full">
           <ConcertCarousel />
         </section>
 
-        {/* Hero Content Section */}
         <section className="pt-24 pb-20 px-6">
           <div className="mx-auto max-w-7xl">
-            <div className="text-center max-w-4xl mx-auto">
-              <div className="inline-flex items-center gap-2 rounded-full bg-main-darkbrown px-4 py-1.5 text-[10px] font-black text-main-yellow uppercase tracking-[0.2em] mb-8 border border-main-gold/30">
+            <div className="text-center max-w-4xl mx-auto mb-20">
+              <div className="inline-flex items-center gap-2 rounded-full bg-main-darkbrown px-4 py-1.5 text-[10px] font-bold text-main-yellow uppercase tracking-[0.2em] mb-8 border border-main-gold/30">
                 #1 Concert Planner in Jakarta
               </div>
-              
-              <p className="text-lg md:text-xl text-main-darkbrown/40 max-w-2xl mx-auto leading-relaxed font-bold uppercase tracking-widest text-[12px] mb-12">
+              <p className="text-lg md:text-xl text-main-darkbrown/40 max-w-2xl mx-auto leading-relaxed font-bold uppercase tracking-widest text-[12px]">
                 Platform all-in-one untuk merencanakan tiket, transportasi, hingga hotel.
               </p>
-
-              {/* Enhanced Search Bar */}
-              <div className="max-w-2xl mx-auto relative group mb-24">
-                <div className="relative flex items-center bg-white rounded-[26px] border-2 border-main-gray p-2 shadow-2xl shadow-main-darkbrown/5 focus-within:border-main-gold transition-all duration-300">
-                  <div className="flex-1 flex items-center px-4">
-                    <svg className="h-5 w-5 text-main-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                    <input 
-                      type="text" 
-                      placeholder="Cari konser, artis, atau venue..." 
-                      className="w-full px-4 py-3 bg-transparent text-main-darkbrown font-bold focus:outline-none placeholder:text-main-darkbrown/20 uppercase tracking-widest text-xs"
-                    />
-                  </div>
-                  <Button size="lg" className="rounded-2xl px-10 hidden sm:block h-14 text-xs font-black uppercase tracking-widest">
-                    Cari Tiket
-                  </Button>
-                </div>
-              </div>
             </div>
 
-            {/* Roblox-style Horizontal Sliders */}
-            <div className="space-y-20 font-avenir">
+            <div className="space-y-32">
+              
               {/* Category 1: Concerts */}
-              <div className="space-y-6">
-                <div className="flex items-center justify-between px-2">
-                  <h3 className="text-sm font-bold uppercase tracking-[0.3em] text-main-darkbrown font-avenir">Trending Concerts</h3>
-                  <Link href="/plan/ticket" className="text-[10px] font-bold uppercase text-main-gold tracking-widest hover:underline">View All</Link>
-                </div>
-                <div className="flex overflow-x-auto gap-6 pb-6 no-scrollbar snap-x snap-mandatory">
-                  {[
-                    { name: "LANY", price: "Rp 1.500.000", info: "Stadium GBK", date: "Nov 2026", img: "/lany.jpg" },
-                    { name: "Bruno Mars", price: "Rp 2.200.000", info: "JIS Jakarta", date: "Dec 2026", img: "/bruno.jpg" },
-                    { name: "Coldplay", price: "Rp 3.000.000", info: "GBK Jakarta", date: "Jan 2027", img: "/coldplay.jpg" },
-                    { name: "TULUS", price: "Rp 800.000", info: "JIEXPO", date: "Oct 2026", img: "/tulus.jpg" },
-                  ].map((item, i) => (
-                    <div 
-                      key={i} 
-                      onClick={() => handleConcertSelect(item.name, item.info)}
-                      className="min-w-[240px] md:min-w-[280px] snap-start group cursor-pointer block"
-                    >
-                      <div className="aspect-[4/3] rounded-[24px] bg-main-cream mb-4 overflow-hidden relative border-2 border-main-gray group-hover:border-main-gold transition-all duration-300">
-                         <div className="absolute inset-0 bg-gradient-to-br from-main-darkbrown/10 to-transparent z-10"></div>
-                         <div className="w-full h-full bg-main-cream flex items-center justify-center text-main-darkbrown/10 font-bold text-4xl text-center px-4 leading-none font-avenir">
-                           {item.name}
-                         </div>
-                         <div className="absolute bottom-4 left-4 rounded-lg bg-white/90 backdrop-blur-sm px-3 py-1 text-[9px] font-bold text-main-darkbrown uppercase tracking-widest border border-main-gray z-20">
-                           {item.date}
-                         </div>
-                      </div>
-                      <h4 className="text-sm font-bold text-main-darkbrown uppercase tracking-tight mb-1 font-avenir">{item.name}</h4>
-                      <div className="flex items-center justify-between">
-                         <span className="text-[10px] font-bold text-main-gold uppercase tracking-widest">{item.price}</span>
-                         <span className="text-[9px] font-bold text-main-darkbrown/40 uppercase tracking-widest">{item.info}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Category 2: Transport */}
-              <div className="space-y-6">
-                <div className="flex items-center justify-between px-2">
-                  <h3 className="text-sm font-bold uppercase tracking-[0.3em] text-main-darkbrown font-avenir">Travel Partners</h3>
-                  <Link href="/plan/transport-to" className="text-[10px] font-bold uppercase text-main-gold tracking-widest hover:underline">View All</Link>
-                </div>
-                <div className="flex overflow-x-auto gap-6 pb-6 no-scrollbar snap-x snap-mandatory">
-                  {[
-                    { name: "Garuda Indonesia", price: "Starts Rp 1.2M", info: "Flight • Priority", type: 'plane' },
-                    { name: "KAI Argo Bromo", price: "Starts Rp 600k", info: "Train • Executive", type: 'train' },
-                    { name: "Citilink", price: "Starts Rp 800k", info: "Flight • Economy", type: 'plane' },
-                    { name: "KAI Taksaka", price: "Starts Rp 550k", info: "Train • Executive", type: 'train' },
-                  ].map((item, i) => (
-                    <div 
-                      key={i} 
-                      onClick={() => handleTransportSelect(item.type, item.name)}
-                      className="min-w-[240px] md:min-w-[280px] snap-start group cursor-pointer block"
-                    >
-                      <div className="aspect-[16/9] rounded-[24px] bg-main-cream mb-4 overflow-hidden relative border-2 border-main-gray group-hover:border-main-gold transition-all duration-300">
-                         <div className="absolute inset-0 bg-gradient-to-br from-main-darkbrown/5 to-transparent z-10"></div>
-                         <div className="w-full h-full bg-main-cream flex items-center justify-center text-main-darkbrown/10 font-bold text-2xl text-center px-4 leading-none font-avenir">
-                           {item.name}
-                         </div>
-                      </div>
-                      <h4 className="text-sm font-bold text-main-darkbrown uppercase tracking-tight mb-1 font-avenir">{item.name}</h4>
-                      <div className="flex items-center justify-between">
-                         <span className="text-[10px] font-bold text-main-gold uppercase tracking-widest">{item.price}</span>
-                         <span className="text-[9px] font-bold text-main-darkbrown/40 uppercase tracking-widest">{item.info}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Category 3: Hotels */}
-              <div className="space-y-6">
-                <div className="flex items-center justify-between px-2">
-                  <h3 className="text-sm font-bold uppercase tracking-[0.3em] text-main-darkbrown font-avenir">Recommended Akomodasi</h3>
-                  <Link href="/plan/hotel" className="text-[10px] font-bold uppercase text-main-gold tracking-widest hover:underline">View All</Link>
-                </div>
-                <div className="flex overflow-x-auto gap-6 pb-6 no-scrollbar snap-x snap-mandatory">
-                  {[
-                    { name: "The Ritz-Carlton", price: "Rp 4.500.000", info: "5 Star • Kuningan", bestChoice: true },
-                    { name: "Kempinski", price: "Rp 5.200.000", info: "5 Star • Bundaran HI", bestChoice: false },
-                    { name: "Fairmont Jakarta", price: "Rp 3.800.000", info: "5 Star • Senayan", bestChoice: true },
-                    { name: "Artotel GBK", price: "Rp 1.200.000", info: "4 Star • Senayan", bestChoice: false },
-                  ].map((item, i) => (
-                    <div 
-                      key={i} 
-                      onClick={() => handleHotelSelect(item.name)}
-                      className="min-w-[240px] md:min-w-[280px] snap-start group cursor-pointer block"
-                    >
-                      <div className="aspect-[4/3] rounded-[24px] bg-main-cream/50 mb-4 overflow-hidden relative border-2 border-main-gray group-hover:border-main-gold transition-all duration-300">
-                         <div className="absolute inset-0 bg-gradient-to-br from-main-darkbrown/10 to-transparent z-10"></div>
-                         <div className="w-full h-full bg-main-cream/30 flex items-center justify-center text-main-darkbrown/10 font-bold text-2xl text-center px-4 leading-none font-avenir">
-                           {item.name}
-                         </div>
-                         {item.bestChoice && (
-                           <div className="absolute top-4 right-4 rounded-lg bg-main-yellow px-2 py-1 text-[8px] font-bold text-main-darkbrown uppercase tracking-widest z-20 font-avenir">
-                             Best Choice
-                           </div>
-                         )}
-                      </div>
-                      <h4 className="text-sm font-bold text-main-darkbrown uppercase tracking-tight mb-1 font-avenir">{item.name}</h4>
-                      <div className="flex items-center justify-between">
-                         <span className="text-[10px] font-bold text-main-gold uppercase tracking-widest">{item.price}/night</span>
-                         <span className="text-[9px] font-bold text-main-darkbrown/40 uppercase tracking-widest">{item.info}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Full-Width Split Section: Flow vs CTA */}
-        <section className="w-full flex flex-col md:flex-row min-h-[700px] mt-24 mb-24">
-            {/* Left Part: Alur Perencanaan */}
-            <div className="flex-1 bg-main-cream/20 p-12 md:p-24 lg:p-32 flex flex-col justify-center border-y-2 md:border-y-0 md:border-r-2 border-main-gray relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-full opacity-[0.02] pointer-events-none" style={{ backgroundImage: 'radial-gradient(var(--raw-main-gold) 1px, transparent 1px)', backgroundSize: '32px 32px' }}></div>
-                
-                <div className="relative z-10 max-w-xl mx-auto md:mr-0 font-avenir">
-                  <h2 className="text-[14px] font-bold uppercase tracking-[0.5em] text-main-gold mb-24 font-avenir">Alur Perencanaan</h2>
-                  
-                  <div className="space-y-12 relative">
-                    <div className="absolute top-0 left-7 w-0.5 h-full bg-main-gold/20"></div>
-                    
-                    {[
-                      { step: "01", title: "Konfirmasi Tiket", desc: "Pilih konser dan amankan tiket Anda." },
-                      { step: "02", title: "Transportasi Utama", desc: "Atur perjalanan ke venue dengan mudah." },
-                      { step: "03", title: "Akomodasi", desc: "Booking penginapan terbaik di lokasi strategis." },
-                      { step: "04", title: "Selesai", desc: "Cek itinerary lengkap di dashboard Anda.", last: true }
-                    ].map((item, i) => (
-                      <div key={i} className="flex items-start gap-12 group relative text-left font-avenir">
-                        <div className={`h-14 w-14 rounded-2xl flex items-center justify-center shrink-0 text-lg font-bold transition-all duration-300 relative z-10 font-avenir ${
-                          item.last ? 'bg-main-darkbrown text-main-yellow shadow-xl shadow-main-darkbrown/20' : 'bg-white border-2 border-main-gray text-main-darkbrown group-hover:border-main-gold group-hover:text-main-gold shadow-sm'
-                        }`}>
-                          {item.step}
+              <ScrollReveal>
+                <div className="space-y-8">
+                  <div className="flex items-center justify-between px-2">
+                    <h3 className="text-sm font-bold uppercase tracking-[0.3em] text-main-darkbrown">Trending Concerts</h3>
+                    <Link href="/plan/ticket" className="text-[10px] font-bold uppercase text-main-gold tracking-widest hover:underline">View All</Link>
+                  </div>
+                  <div className="flex overflow-x-auto gap-6 pb-8 no-scrollbar snap-x snap-mandatory px-2">
+                    {trendingConcerts.map((item, i) => (
+                      <div 
+                        key={i} 
+                        onClick={() => setActivePopup({ title: item.name, desc: item.desc, price: item.price, location: item.info, images: [], type: 'concert' })}
+                        className="min-w-[320px] md:min-w-[420px] snap-start group cursor-pointer bg-white rounded-2xl border-2 border-main-gray p-4 hover:border-main-gold transition-all duration-500 shadow-xl shadow-main-darkbrown/5"
+                      >
+                        <div className="aspect-[21/9] rounded-xl bg-main-cream mb-6 overflow-hidden relative border border-main-gray/10">
+                           {item.img ? (
+                             <img src={item.img} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                           ) : (
+                             <div className="w-full h-full flex items-center justify-center text-main-darkbrown/5 font-bold text-5xl uppercase tracking-tighter px-8 text-center leading-none">{item.name}</div>
+                           )}
+                           <div className="absolute bottom-4 left-4 rounded-lg bg-white/90 backdrop-blur-md px-4 py-1.5 text-[10px] font-bold text-main-darkbrown uppercase tracking-widest border border-main-gray shadow-sm">{item.date}</div>
                         </div>
-                        <div className="pt-2">
-                          <h3 className="text-xl font-bold uppercase tracking-tight text-main-darkbrown mb-1 font-avenir">{item.title}</h3>
-                          <p className="text-[11px] font-bold text-main-darkbrown/40 uppercase tracking-widest leading-relaxed">{item.desc}</p>
+                        <div className="px-2 pb-2">
+                          <h4 className="text-md font-bold text-main-darkbrown uppercase tracking-tight mb-2">{item.name}</h4>
+                          <div className="flex items-center justify-between">
+                             <span className="text-[11px] font-bold text-main-gold uppercase tracking-widest">{item.price}</span>
+                             <span className="text-[10px] font-bold text-main-darkbrown/30 uppercase tracking-widest">{item.info}</span>
+                          </div>
                         </div>
                       </div>
                     ))}
                   </div>
                 </div>
-            </div>
+              </ScrollReveal>
 
-            {/* Right Part: CTA Buttons (Background Dark) */}
-            <div className="flex-1 bg-main-darkbrown p-12 md:p-24 lg:p-32 flex flex-col justify-center items-center text-center relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-main-gold/5 to-transparent opacity-50"></div>
-                
-                <div className="relative z-10 max-w-md w-full space-y-12">
-                  <h2 className="text-4xl md:text-6xl font-bold text-white uppercase leading-none tracking-tighter font-avenir">
-                    Siap Untuk <br />
-                    <span className="text-main-yellow underline decoration-main-gold underline-offset-[12px] decoration-4 text-center block">Konsermu?</span>
-                  </h2>
-                  <p className="text-main-cream/40 text-[10px] font-bold uppercase tracking-[0.3em] mb-12">Mulai sekarang dan kelola semua rencana Anda dengan mudah.</p>
-                  
-                  <div className="flex flex-col gap-6">
-                      <Link href="/dashboard" className="w-full">
-                        <Button variant="outline" className="w-full rounded-2xl py-8 h-auto text-main-white border-main-white/20 hover:border-main-yellow hover:text-main-yellow font-black uppercase tracking-[0.4em] text-xs">
-                          Lihat Dashboard
-                        </Button>
-                      </Link>
-                      <Link href="/plan/ticket" className="w-full">
-                        <Button className="w-full rounded-2xl py-8 h-auto bg-main-yellow text-main-darkbrown font-black uppercase tracking-[0.4em] text-xs hover:bg-main-gold transition-all">
-                          + Tambah Rencana
-                        </Button>
-                      </Link>
+              {/* Category 2: Transport */}
+              <ScrollReveal>
+                <div className="space-y-8">
+                  <div className="flex items-center justify-between px-2">
+                    <h3 className="text-sm font-bold uppercase tracking-[0.3em] text-main-darkbrown">Travel Partners</h3>
+                    <Link href="/plan/transport-to" className="text-[10px] font-bold uppercase text-main-gold tracking-widest hover:underline">View All</Link>
+                  </div>
+                  <div className="flex overflow-x-auto gap-6 pb-8 no-scrollbar snap-x snap-mandatory px-2">
+                    {travelPartners.map((item, i) => (
+                      <div 
+                        key={i} 
+                        onClick={() => setActivePopup({ title: item.name, desc: item.desc, price: item.price, location: item.info, images: [], type: 'transport' })}
+                        className="min-w-[260px] md:min-w-[300px] snap-start group cursor-pointer bg-white rounded-2xl border-2 border-main-gray p-4 hover:border-main-gold transition-all duration-500 shadow-xl shadow-main-darkbrown/5"
+                      >
+                        <div className="aspect-[16/9] rounded-xl bg-main-cream mb-6 flex items-center justify-center relative overflow-hidden border border-main-gray/10">
+                           {item.img ? (
+                             <img src={item.img} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                           ) : (
+                             <span className="text-main-darkbrown/5 font-bold text-2xl uppercase text-center px-4 leading-none">{item.name}</span>
+                           )}
+                        </div>
+                        <div className="px-2 pb-2">
+                          <h4 className="text-sm font-bold text-main-darkbrown uppercase tracking-tight mb-2">{item.name}</h4>
+                          <div className="flex items-center justify-between">
+                             <span className="text-[10px] font-bold text-main-gold uppercase tracking-widest">{item.price}</span>
+                             <span className="text-[9px] font-bold text-main-darkbrown/30 uppercase tracking-widest">{item.info}</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
+              </ScrollReveal>
+
+              {/* Category 3: Hotels */}
+              <ScrollReveal>
+                <div className="space-y-8">
+                  <div className="flex items-center justify-between px-2">
+                    <h3 className="text-sm font-bold uppercase tracking-[0.3em] text-main-darkbrown">Recommended Akomodasi</h3>
+                    <Link href="/plan/hotel" className="text-[10px] font-bold uppercase text-main-gold tracking-widest hover:underline">View All</Link>
+                  </div>
+                  <div className="flex overflow-x-auto gap-6 pb-8 no-scrollbar snap-x snap-mandatory px-2">
+                    {hotels.map((item, i) => (
+                      <div 
+                        key={i} 
+                        onClick={() => setActivePopup({ title: item.name, desc: item.desc, price: item.price, location: item.info, images: item.images, type: 'hotel' })}
+                        className="min-w-[280px] md:min-w-[340px] snap-start group cursor-pointer bg-white rounded-3xl border-2 border-main-gray p-5 hover:border-main-gold transition-all duration-500 shadow-xl shadow-main-darkbrown/5"
+                      >
+                        <div className="aspect-[4/3] rounded-2xl bg-main-cream/30 mb-6 overflow-hidden relative group/img border border-main-gray/10">
+                           <div className="w-full h-full flex gap-1 p-1">
+                              <div className="flex-1 bg-main-darkbrown/5 rounded-xl overflow-hidden border border-main-gray/50">
+                                 {/* @ts-ignore */}
+                                 {item.img1 && <img src={item.img1} className="w-full h-full object-cover" alt="Main" />}
+                              </div>
+                              <div className="flex-1 flex flex-col gap-1">
+                                 <div className="flex-1 bg-main-darkbrown/5 rounded-lg overflow-hidden border border-main-gray/50">
+                                    {/* @ts-ignore */}
+                                    {item.img2 && <img src={item.img2} className="w-full h-full object-cover" alt="Small 1" />}
+                                 </div>
+                                 <div className="flex-1 bg-main-darkbrown/5 rounded-lg overflow-hidden border border-main-gray/50">
+                                    {/* @ts-ignore */}
+                                    {item.img3 && <img src={item.img3} className="w-full h-full object-cover" alt="Small 2" />}
+                                 </div>
+                              </div>
+                           </div>
+                           <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity bg-main-darkbrown/20 backdrop-blur-sm">
+                              <span className="text-[10px] font-bold text-white uppercase tracking-widest">Lihat Galeri</span>
+                           </div>
+                           {item.bestChoice && (
+                             <div className="absolute top-4 right-4 rounded-lg bg-main-yellow px-4 py-1.5 text-[9px] font-bold text-main-darkbrown uppercase tracking-widest shadow-lg">Best Choice</div>
+                           )}
+                        </div>
+                        <div className="px-2 pb-2">
+                          <h4 className="text-md font-bold text-main-darkbrown uppercase tracking-tight mb-2">{item.name}</h4>
+                          <div className="flex items-center justify-between">
+                             <span className="text-[11px] font-bold text-main-gold uppercase tracking-widest">{item.price}/night</span>
+                             <span className="text-[10px] font-bold text-main-darkbrown/30 uppercase tracking-widest">{item.info}</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </ScrollReveal>
             </div>
+          </div>
         </section>
 
-        <div className="h-24"></div>
+        {/* Informational Popups */}
+        {activePopup && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-main-darkbrown/90 backdrop-blur-xl animate-in fade-in duration-300">
+             <div className="bg-white rounded-[40px] max-w-2xl w-full relative shadow-2xl animate-in zoom-in-95 duration-300 overflow-hidden border-4 border-main-gray">
+                
+                {/* Fixed Header with Close Button - No collision with content */}
+                <div className="bg-white border-b border-main-gray p-6 flex items-center justify-between">
+                   <div className="flex flex-col">
+                      <span className="text-[8px] font-bold text-main-gold uppercase tracking-[0.4em]">Details View</span>
+                      <span className="text-[10px] font-bold text-main-darkbrown uppercase tracking-widest truncate max-w-[200px]">{activePopup.title}</span>
+                   </div>
+                   <button 
+                     onClick={() => setActivePopup(null)} 
+                     className="h-10 w-10 rounded-xl bg-main-gray/20 hover:bg-main-gold/20 flex items-center justify-center text-main-darkbrown/40 hover:text-main-gold transition-all group"
+                   >
+                     <svg className="h-5 w-5 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3.5}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                   </button>
+                </div>
+
+                <div className="p-8 md:p-12 overflow-y-auto max-h-[75vh] no-scrollbar">
+                   <div className="space-y-8">
+                      <div className="aspect-video bg-main-cream/30 rounded-2xl overflow-hidden flex items-center justify-center border-2 border-main-gray shadow-inner relative">
+                         <span className="text-main-darkbrown/10 font-bold text-2xl md:text-4xl uppercase text-center px-6 leading-tight">{activePopup.title}</span>
+                      </div>
+                      
+                      <div className="space-y-6 px-2">
+                         <h2 className="text-2xl md:text-3xl font-bold text-main-darkbrown uppercase tracking-tighter leading-none">{activePopup.title}</h2>
+                         
+                         <p className="text-xs md:text-sm font-bold text-main-darkbrown/50 leading-relaxed uppercase tracking-wide">{activePopup.desc}</p>
+                         
+                         <div className="grid grid-cols-2 gap-3 md:gap-4">
+                            <div className="bg-main-gray/20 p-4 md:p-6 rounded-2xl border border-main-gray">
+                               <span className="text-[8px] md:text-[9px] font-bold uppercase tracking-widest text-main-darkbrown/30">Price/Starts From</span>
+                               <p className="text-md md:text-lg font-bold text-main-gold mt-1">{activePopup.price}</p>
+                            </div>
+                            <div className="bg-main-gray/20 p-4 md:p-6 rounded-2xl border border-main-gray">
+                               <span className="text-[8px] md:text-[9px] font-bold uppercase tracking-widest text-main-darkbrown/30">Location/Venue</span>
+                               <p className="text-xs md:text-sm font-bold text-main-darkbrown mt-1 uppercase tracking-tight">{activePopup.location}</p>
+                            </div>
+                         </div>
+
+                         {activePopup.type === 'concert' && (
+                           <Button 
+                             onClick={() => {
+                               handleConcertSelect(activePopup.title, activePopup.location);
+                               setActivePopup(null);
+                             }}
+                             className="w-full h-14 md:h-16 rounded-2xl font-bold uppercase tracking-widest mt-2 shadow-xl shadow-main-gold/20"
+                           >
+                             Pilih & Atur Rencana
+                           </Button>
+                         )}
+                      </div>
+                   </div>
+                </div>
+             </div>
+          </div>
+        )}
       </main>
 
       <Footer />
-
-      <style jsx global>{`
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-      `}</style>
     </div>
   );
 }

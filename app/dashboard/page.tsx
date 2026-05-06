@@ -26,7 +26,7 @@ export default function DashboardPage() {
 
   if (!mounted) {
     return (
-      <div className="flex min-h-screen flex-col bg-neutral-50/50">
+      <div className="flex min-h-screen flex-col bg-neutral-50/50 font-avenir">
         <Navbar />
         <main className="flex-1" />
         <Footer />
@@ -35,19 +35,19 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-neutral-50/50">
+    <div className="flex min-h-screen flex-col bg-neutral-50/50 font-avenir">
       <Navbar />
       <main className="flex-1 py-12 px-4 sm:px-6 lg:px-8 relative">
         <div className="mx-auto max-w-5xl">
           <div className="mb-12 flex flex-col sm:flex-row sm:items-end justify-between gap-6">
             <div>
-              <div className="inline-block rounded-lg bg-main-gold/10 px-3 py-1 text-[10px] font-black text-main-gold uppercase tracking-[0.2em] mb-4 border border-main-gold/20">
+              <div className="inline-block rounded-lg bg-main-gold/10 px-3 py-1 text-[10px] font-bold text-main-gold uppercase tracking-[0.2em] mb-4 border border-main-gold/20">
                 Personal Workspace
               </div>
-              <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-main-darkbrown uppercase font-avenir">Dashboard <span className="text-main-gold">Saya</span></h1>
+              <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-main-darkbrown uppercase">Dashboard <span className="text-main-gold">Saya</span></h1>
             </div>
             <Link href="/plan/ticket">
-              <Button className="rounded-2xl px-10 h-14 text-xs font-black uppercase tracking-[0.2em] shadow-2xl shadow-main-darkbrown/10 hover:translate-y-[-2px] transition-all duration-300">
+              <Button className="rounded-2xl px-10 h-14 text-xs font-bold uppercase tracking-[0.2em] shadow-2xl shadow-main-darkbrown/10 hover:translate-y-[-2px] transition-all duration-300">
                 + New Plan
               </Button>
             </Link>
@@ -55,7 +55,7 @@ export default function DashboardPage() {
 
           {plans.length === 0 ? (
             <div className="flex flex-col items-center justify-center rounded-[40px] bg-white p-16 text-center shadow-2xl shadow-main-darkbrown/5 border-2 border-main-gray/50">
-              <h3 className="text-2xl font-bold text-main-darkbrown uppercase font-avenir">Belum ada rencana yang tersimpan</h3>
+              <h3 className="text-2xl font-bold text-main-darkbrown uppercase">Belum ada rencana yang tersimpan</h3>
               <Link href="/plan/ticket" className="mt-10">
                 <Button variant="secondary" size="lg" className="rounded-2xl px-10">Mulai Merencanakan</Button>
               </Link>
@@ -70,34 +70,27 @@ export default function DashboardPage() {
         </div>
 
         {selectedDetail && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-main-darkbrown/90 backdrop-blur-xl animate-in fade-in duration-300 font-avenir">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-main-darkbrown/90 backdrop-blur-xl animate-in fade-in duration-300">
              <div className="bg-white rounded-[40px] max-w-xl w-full max-h-[90vh] overflow-y-auto p-10 relative shadow-2xl animate-in zoom-in-95 duration-300 no-scrollbar">
-                <button onClick={() => setSelectedDetail(null)} className="absolute top-8 right-8 text-main-darkbrown/20 hover:text-main-gold transition-colors">
+                <button onClick={() => setSelectedDetail(null)} className="absolute top-8 right-8 text-main-darkbrown/20 hover:text-main-gold transition-colors z-20">
                   <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
                 
-                <div className="text-[10px] font-black uppercase tracking-[0.4em] text-main-gold mb-2">{selectedDetail.title}</div>
+                <div className="text-[10px] font-bold uppercase tracking-[0.4em] text-main-gold mb-2">{selectedDetail.title}</div>
                 <h2 className="text-3xl font-bold text-main-darkbrown uppercase tracking-tighter mb-8">{selectedDetail.subtitle}</h2>
                 
                 <div className="space-y-6">
                   {selectedDetail.type === 'transport' && (
                     <div className="space-y-8">
+                       {/* Developer QR Image Slot */}
                        <div className="flex flex-col items-center bg-main-cream/20 rounded-3xl p-8 border-2 border-dashed border-main-gray">
-                          <div className="w-48 h-48 bg-white p-6 rounded-3xl shadow-inner border-2 border-main-gray mb-6 flex items-center justify-center relative group">
-                             {/* Template QR Code Marker corners */}
-                             <div className="absolute top-6 left-6 w-10 h-10 border-4 border-main-darkbrown rounded-lg"></div>
-                             <div className="absolute top-6 right-6 w-10 h-10 border-4 border-main-darkbrown rounded-lg"></div>
-                             <div className="absolute bottom-6 left-6 w-10 h-10 border-4 border-main-darkbrown rounded-lg"></div>
-                             
-                             {/* Empty Placeholder Pattern */}
-                             <div className="w-full h-full opacity-5 flex flex-wrap gap-1 items-center justify-center">
-                                {[...Array(64)].map((_, i) => (
-                                  <div key={i} className="w-2 h-2 bg-main-darkbrown rounded-sm"></div>
-                                ))}
-                             </div>
-                             
-                             <div className="absolute inset-0 flex items-center justify-center">
-                                <span className="text-[10px] font-bold uppercase tracking-widest text-main-darkbrown/20 group-hover:text-main-gold transition-colors">Scan Ready</span>
+                          <div className="w-full aspect-[4/3] max-w-sm bg-main-gray/10 rounded-2xl border border-main-gray mb-6 flex flex-col items-center justify-center text-center relative overflow-hidden group">
+                             {/* Replace 'src' below with actual ticket image URL */}
+                             <div className="absolute inset-0 flex items-center justify-center p-8">
+                                <div className="text-center space-y-3">
+                                   <svg className="h-8 w-8 text-main-darkbrown/20 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                   <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-main-darkbrown/30">E-Ticket Image Slot <br /> (Manually added by developer)</p>
+                                </div>
                              </div>
                           </div>
                           <div className="text-center">
@@ -139,15 +132,15 @@ export default function DashboardPage() {
 
                   {selectedDetail.type === 'hotel' && (
                     <div className="space-y-8">
-                       <div className="flex flex-col items-center bg-main-gold/5 rounded-3xl p-8 border-2 border-main-gold/20">
-                          <div className="w-full h-20 flex items-center justify-center gap-1.5 mb-6 px-4">
-                             {[...Array(30)].map((_, i) => (
-                               <div key={i} className={`w-1.5 bg-main-darkbrown rounded-full ${i % 3 === 0 ? 'h-full' : 'h-1/2'}`}></div>
-                             ))}
-                          </div>
-                          <div className="text-center">
+                       <div className="flex flex-col items-center bg-main-gold/5 rounded-3xl p-10 border-2 border-main-gold/20">
+                          <div className="text-center mb-8">
                             <p className="text-[10px] font-bold uppercase tracking-widest text-main-darkbrown/40">Hotel Booking ID</p>
-                            <p className="text-2xl font-bold text-main-darkbrown tracking-widest uppercase mt-1">HTL-QS2911</p>
+                            <p className="text-3xl font-bold text-main-darkbrown tracking-widest uppercase mt-2">HTL-QS2911</p>
+                          </div>
+                          <div className="w-full h-[1px] bg-main-gold/20 mb-8"></div>
+                          <div className="text-center">
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-main-darkbrown/40">Atas Nama</p>
+                            <p className="text-xl font-bold text-main-darkbrown uppercase mt-1">Registered Guest</p>
                           </div>
                        </div>
 
@@ -155,14 +148,14 @@ export default function DashboardPage() {
                           <div className="grid grid-cols-3 gap-1 p-6 bg-white border-2 border-main-gray rounded-[32px]">
                              <div className="text-center">
                                <p className="text-[8px] font-bold uppercase text-main-darkbrown/40 tracking-widest mb-1">Check-in</p>
-                               <p className="text-xs font-bold text-main-darkbrown uppercase">14:00 WIB</p>
+                               <p className="text-xs font-bold text-main-darkbrown uppercase">{selectedDetail.data.checkIn || '14:00 WIB'}</p>
                              </div>
                              <div className="flex items-center justify-center">
                                 <div className="h-8 w-[1px] bg-main-gray"></div>
                              </div>
                              <div className="text-center">
                                <p className="text-[8px] font-bold uppercase text-main-darkbrown/40 tracking-widest mb-1">Check-out</p>
-                               <p className="text-xs font-bold text-main-darkbrown uppercase">12:00 WIB</p>
+                               <p className="text-xs font-bold text-main-darkbrown uppercase">{selectedDetail.data.checkOut || '12:00 WIB'}</p>
                              </div>
                           </div>
                           
@@ -226,7 +219,7 @@ export default function DashboardPage() {
                                <div className="absolute top-0 right-0 w-32 h-32 bg-main-gold opacity-5 rounded-full translate-x-1/2 -translate-y-1/2"></div>
                                
                                <div className="flex items-center justify-between relative z-10">
-                                  <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-main-gold">Rute Integrasi</h4>
+                                  <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-main-gold">Rute Perjalanan</h4>
                                   <div className="px-4 py-1.5 rounded-full bg-white/10 text-[9px] font-bold tracking-widest uppercase border border-white/5 backdrop-blur-md">Multi-Modal</div>
                                </div>
                                
@@ -270,8 +263,6 @@ export default function DashboardPage() {
                     </div>
                   )}
                 </div>
-
-                <Button onClick={() => setSelectedDetail(null)} variant="outline" className="w-full mt-10 rounded-2xl h-16 font-bold uppercase tracking-widest border-main-gray text-main-darkbrown/20">Kembali ke Dashboard</Button>
              </div>
           </div>
         )}
@@ -330,7 +321,7 @@ function PlanCard({ plan, onDetailClick }: { plan: ConcertPlan; onDetailClick: (
               title: 'Detail Akomodasi', 
               subtitle: plan.hotel.name || 'Hotel', 
               type: 'hotel', 
-              data: { hotel: plan.hotel } 
+              data: { hotel: plan.hotel, checkIn: plan.hotel.checkIn, checkOut: plan.hotel.checkOut } 
             })}
           />
           <DetailItem 
@@ -368,7 +359,7 @@ function DetailItem({ label, value, icon, onClick }: { label: string; value: str
         {icon}
       </div>
       <div>
-        <dt className="text-[10px] font-black uppercase tracking-[0.2em] text-main-darkbrown/30 mb-1">{label}</dt>
+        <dt className="text-[10px] font-bold uppercase tracking-[0.2em] text-main-darkbrown/30 mb-1">{label}</dt>
         <dd className="text-xs font-bold text-main-darkbrown leading-tight uppercase tracking-tight">{value}</dd>
       </div>
     </div>

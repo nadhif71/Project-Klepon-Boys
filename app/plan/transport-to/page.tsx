@@ -1,69 +1,170 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { usePlan } from '@/context/PlanContext';
 import { Button } from '@/components/Button';
 import { TransportType } from '@/lib/types';
 
+const majorCities = [
+  { name: 'Jakarta', hubs: { plane: ['Bandara Soekarno-Hatta (CGK)', 'Bandara Halim Perdanakusuma (HLP)'], train: ['Stasiun Gambir', 'Stasiun Senen'] } },
+  { name: 'Surabaya', hubs: { plane: ['Bandara Juanda (SUB)'], train: ['Stasiun Pasar Turi', 'Stasiun Gubeng'] } },
+  { name: 'Bandung', hubs: { plane: [], train: ['Stasiun Bandung', 'Stasiun Kiaracondong'] } },
+  { name: 'Yogyakarta', hubs: { plane: ['Yogyakarta International (YIA)'], train: ['Stasiun Tugu', 'Stasiun Lempuyangan'] } },
+  { name: 'Semarang', hubs: { plane: ['Bandara Ahmad Yani (SRG)'], train: ['Stasiun Tawang', 'Stasiun Poncol'] } },
+  { name: 'Medan', hubs: { plane: ['Bandara Kualanamu (KNO)'], train: ['Stasiun Medan'] } },
+];
+
+const jakartaHubs = {
+  plane: ['Bandara Soekarno-Hatta (CGK)', 'Bandara Halim Perdanakusuma (HLP)'],
+  train: ['Stasiun Gambir', 'Stasiun Senen']
+};
+
 export default function TransportToPage() {
   const router = useRouter();
   const { currentPlan, updateCurrentPlan } = usePlan();
   
-  const [origin, setOrigin] = useState(currentPlan?.origin || '');
-  const [selectedOption, setSelectedOption] = useState<{name: string, price: string, type: TransportType} | null>(null);
+  const [transportType, setTransportType] = useState<TransportType>('plane');
+  const [originCity, setOriginCity] = useState('');
+  const [selectedHub, setSelectedHub] = useState('');
+  const [destHub, setDestHub] = useState('');
+  
+  const [isCityOpen, setIsCityOpen] = useState(false);
+  const [isHubOpen, setIsHubOpen] = useState(false);
+  const [isDestOpen, setIsDestOpen] = useState(false);
+  const [selectedOption, setSelectedOption] = useState<{name: string, price: string} | null>(null);
+  
+  const cityRef = useRef<HTMLDivElement>(null);
+  const hubRef = useRef<HTMLDivElement>(null);
+  const destRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (cityRef.current && !cityRef.current.contains(event.target as Node)) setIsCityOpen(false);
+      if (hubRef.current && !hubRef.current.contains(event.target as Node)) setIsHubOpen(false);
+      if (destRef.current && !destRef.current.contains(event.target as Node)) setIsDestOpen(false);
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleNext = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedOption) return;
     
     updateCurrentPlan({
-      origin,
+      origin: `${originCity} (${selectedHub})`,
       transportTo: {
-        type: selectedOption.type,
+        type: transportType,
         bookingStatus: 'booked',
-        details: selectedOption.name,
+        details: `${selectedOption.name} Menuju ${destHub}`,
       },
     });
     router.push('/plan/hotel');
   };
 
-  const travelokaOptions = [
-    { name: 'Garuda Indonesia GA-402', price: 'Rp 1.450.000', type: 'plane', icon: '✈️', class: 'Economy' },
-    { name: 'Batik Air ID-6523', price: 'Rp 950.000', type: 'plane', icon: '✈️', class: 'Economy' },
-    { name: 'Argo Bromo Anggrek', price: 'Rp 650.000', type: 'train', icon: '🚆', class: 'Executive' },
-    { name: 'Taksaka Malam', price: 'Rp 550.000', type: 'train', icon: '🚆', class: 'Executive' },
-    { name: 'DayTrans Executive', price: 'Rp 250.000', type: 'bus', icon: '🚌', class: 'Shuttle' },
-    { name: 'Jackal Holidays', price: 'Rp 220.000', type: 'bus', icon: '🚌', class: 'Shuttle' },
+  const availableHubs = majorCities.find(c => c.name === originCity)?.hubs[transportType as 'plane' | 'train'] || [];
+  const availableDestHubs = jakartaHubs[transportType as 'plane' | 'train'];
+
+  const travelokaOptions = transportType === 'plane' ? [
+    { name: 'Garuda Indonesia GA-402', price: 'Rp 1.450.000', time: '08:00', class: 'Economy' },
+    { name: 'Batik Air ID-6523', price: 'Rp 950.000', time: '10:30', class: 'Economy' },
+    { name: 'Citilink QG-112', price: 'Rp 820.000', time: '13:15', class: 'Economy' },
+  ] : [
+    { name: 'Argo Bromo Anggrek', price: 'Rp 650.000', time: '19:00', class: 'Executive' },
+    { name: 'Taksaka Malam', price: 'Rp 550.000', time: '21:00', class: 'Executive' },
+    { name: 'Bima 76', price: 'Rp 600.000', time: '17:00', class: 'Executive' },
   ];
 
   return (
-    <div className="space-y-10 text-left">
+    <div className="space-y-10 text-left font-avenir">
       <div>
-        <h2 className="text-3xl font-black text-main-darkbrown italic uppercase tracking-tighter">Transportasi Utama</h2>
+        <h2 className="text-3xl font-bold text-main-darkbrown uppercase tracking-tighter">Kepergian Utama</h2>
         <p className="mt-3 text-[10px] font-bold text-main-darkbrown/40 uppercase tracking-widest leading-relaxed">
-          Bekerja sama dengan <span className="text-main-gold">Traveloka</span> untuk perjalanan Anda.
+          Pilih moda menuju <span className="text-main-gold">Jakarta</span> via <span className="text-main-gold">Traveloka</span>.
         </p>
       </div>
 
-      <form onSubmit={handleNext} className="space-y-10">
-        <div className="space-y-4 text-left">
-          <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-main-darkbrown/40 ml-1">Lokasi Asal</label>
-          <input
-            type="text"
-            required
-            placeholder="DARI KOTA MANA?"
-            className="w-full rounded-2xl border-2 border-main-gray bg-transparent px-5 py-4 text-main-darkbrown font-bold focus:border-main-gold focus:outline-none transition-colors placeholder:text-main-darkbrown/10 uppercase tracking-widest text-xs"
-            value={origin}
-            onChange={(e) => setOrigin(e.target.value)}
-          />
+      <div className="flex gap-2">
+         {['plane', 'train'].map((t) => (
+           <button
+             key={t}
+             type="button"
+             onClick={() => {
+               setTransportType(t as TransportType);
+               setSelectedHub('');
+               setDestHub('');
+               setSelectedOption(null);
+             }}
+             className={`flex-1 py-4 rounded-2xl border-2 font-bold text-[10px] uppercase tracking-widest transition-all ${
+               transportType === t 
+               ? 'border-main-gold bg-main-gold text-white shadow-lg shadow-main-gold/20' 
+               : 'border-main-gray text-main-darkbrown/40 hover:border-main-gold/30'
+             }`}
+           >
+             {t === 'plane' ? 'Pesawat' : 'Kereta Api'}
+           </button>
+         ))}
+      </div>
+
+      <form onSubmit={handleNext} className="space-y-8">
+        <div className="grid grid-cols-1 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Origin City */}
+            <div className="space-y-3 relative" ref={cityRef}>
+              <label className="block text-[8px] font-bold uppercase tracking-[0.2em] text-main-darkbrown/40 ml-1">Kota Asal</label>
+              <div onClick={() => setIsCityOpen(!isCityOpen)} className="w-full rounded-2xl border-2 border-main-gray bg-transparent px-5 py-4 flex items-center justify-between cursor-pointer hover:border-main-gold/50 transition-colors">
+                <span className={`uppercase tracking-widest text-[10px] font-bold ${originCity ? 'text-main-darkbrown' : 'text-main-darkbrown/20'}`}>{originCity || 'PILIH KOTA'}</span>
+                <svg className={`h-3 w-3 text-main-gold transition-transform ${isCityOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 9l-7 7-7-7" /></svg>
+              </div>
+              {isCityOpen && (
+                <div className="absolute z-[70] left-0 right-0 mt-2 bg-white rounded-2xl border-2 border-main-gray shadow-2xl overflow-hidden">
+                   {majorCities.map(city => (
+                     <div key={city.name} onClick={() => { setOriginCity(city.name); setSelectedHub(''); setIsCityOpen(false); }} className="px-6 py-3 hover:bg-main-gold/5 cursor-pointer text-[10px] font-bold text-main-darkbrown/60 uppercase tracking-widest hover:text-main-darkbrown">{city.name}</div>
+                   ))}
+                </div>
+              )}
+            </div>
+
+            {/* Origin Hub */}
+            <div className="space-y-3 relative" ref={hubRef}>
+              <label className="block text-[8px] font-bold uppercase tracking-[0.2em] text-main-darkbrown/40 ml-1">Titik Berangkat</label>
+              <div onClick={() => originCity && setIsHubOpen(!isHubOpen)} className={`w-full rounded-2xl border-2 border-main-gray bg-transparent px-5 py-4 flex items-center justify-between cursor-pointer transition-colors ${!originCity ? 'opacity-50 cursor-not-allowed' : 'hover:border-main-gold/50'}`}>
+                <span className={`uppercase tracking-widest text-[10px] font-bold ${selectedHub ? 'text-main-darkbrown' : 'text-main-darkbrown/20'}`}>{selectedHub || 'PILIH TITIK'}</span>
+                <svg className={`h-3 w-3 text-main-gold transition-transform ${isHubOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 9l-7 7-7-7" /></svg>
+              </div>
+              {isHubOpen && (
+                <div className="absolute z-[70] left-0 right-0 mt-2 bg-white rounded-2xl border-2 border-main-gray shadow-2xl overflow-hidden">
+                   {availableHubs.length > 0 ? availableHubs.map(hub => (
+                     <div key={hub} onClick={() => { setSelectedHub(hub); setIsHubOpen(false); }} className="px-6 py-3 hover:bg-main-gold/5 cursor-pointer text-[10px] font-bold text-main-darkbrown/60 uppercase tracking-widest hover:text-main-darkbrown">{hub}</div>
+                   )) : <div className="px-6 py-3 text-[10px] text-main-darkbrown/20 uppercase tracking-widest">Tidak tersedia</div>}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Destination Hub (Fixed to Jakarta) */}
+          <div className="space-y-3 relative" ref={destRef}>
+            <label className="block text-[8px] font-bold uppercase tracking-[0.2em] text-main-darkbrown/40 ml-1">Tujuan (Jakarta)</label>
+            <div onClick={() => selectedHub && setIsDestOpen(!isDestOpen)} className={`w-full rounded-2xl border-2 border-main-gray bg-transparent px-5 py-4 flex items-center justify-between cursor-pointer transition-colors ${!selectedHub ? 'opacity-50 cursor-not-allowed' : 'hover:border-main-gold/50'}`}>
+              <span className={`uppercase tracking-widest text-[10px] font-bold ${destHub ? 'text-main-darkbrown' : 'text-main-darkbrown/20'}`}>{destHub || 'PILIH TITIK DI JAKARTA'}</span>
+              <svg className={`h-3 w-3 text-main-gold transition-transform ${isDestOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 9l-7 7-7-7" /></svg>
+            </div>
+            {isDestOpen && (
+              <div className="absolute z-[70] left-0 right-0 mt-2 bg-white rounded-2xl border-2 border-main-gray shadow-2xl overflow-hidden">
+                 {availableDestHubs.map(hub => (
+                   <div key={hub} onClick={() => { setDestHub(hub); setIsDestOpen(false); }} className="px-6 py-3 hover:bg-main-gold/5 cursor-pointer text-[10px] font-bold text-main-darkbrown/60 uppercase tracking-widest hover:text-main-darkbrown">{hub}</div>
+                 ))}
+              </div>
+            )}
+          </div>
         </div>
 
-        {origin && (
-          <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="flex items-center justify-between border-b-2 border-main-gray pb-4 mb-6">
-              <label className="text-[10px] font-black uppercase tracking-[0.2em] text-main-darkbrown/40">Opsi Tiket Tersedia</label>
-              <span className="text-[8px] font-black uppercase bg-[#0194f3] text-white px-3 py-1 rounded-full italic">Powered by Traveloka</span>
+        {destHub && (
+          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
+            <div className="flex items-center justify-between border-b border-main-gray pb-4">
+              <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-main-darkbrown/40">Opsi Tiket</label>
+              <span className="text-[8px] font-bold uppercase text-main-gold px-3 py-1 bg-main-gold/5 rounded-full">Official Traveloka Partner</span>
             </div>
 
             <div className="grid grid-cols-1 gap-3">
@@ -71,23 +172,23 @@ export default function TransportToPage() {
                 <button
                   key={i}
                   type="button"
-                  onClick={() => setSelectedOption({name: opt.name, price: opt.price, type: opt.type as TransportType})}
+                  onClick={() => setSelectedOption(opt)}
                   className={`flex items-center justify-between rounded-[24px] border-2 px-6 py-5 transition-all duration-300 ${
                     selectedOption?.name === opt.name
                       ? 'border-main-gold bg-main-gold/5 text-main-darkbrown'
                       : 'border-main-gray bg-transparent text-main-darkbrown/30 hover:border-main-gold/30'
                   }`}
                 >
-                  <div className="flex items-center gap-5">
-                    <span className="text-2xl">{opt.icon}</span>
-                    <div className="text-left">
-                      <span className="block text-[11px] font-black uppercase tracking-widest italic leading-none">{opt.name}</span>
-                      <span className="block text-[8px] font-bold text-main-darkbrown/30 uppercase tracking-[0.2em] mt-2">{opt.class} Class</span>
+                  <div className="text-left">
+                    <div className="flex items-center gap-2 mb-1">
+                       <span className="block text-[11px] font-bold uppercase tracking-widest leading-none">{opt.name}</span>
+                       <span className="text-[9px] font-bold text-main-gold uppercase tracking-tighter">[{opt.time}]</span>
                     </div>
+                    <span className="block text-[8px] font-bold text-main-darkbrown/30 uppercase tracking-[0.2em] mt-1">{opt.class} Class</span>
                   </div>
                   <div className="text-right">
-                    <span className="block text-[12px] font-black text-main-darkbrown tracking-tight leading-none">{opt.price}</span>
-                    <span className="block text-[7px] font-black text-main-gold uppercase tracking-widest mt-2">Book Now</span>
+                    <span className="block text-[12px] font-bold text-main-darkbrown tracking-tight leading-none">{opt.price}</span>
+                    <span className="block text-[7px] font-bold text-main-gold uppercase tracking-widest mt-2">Book Now</span>
                   </div>
                 </button>
               ))}
@@ -96,21 +197,8 @@ export default function TransportToPage() {
         )}
 
         <div className="flex gap-4 pt-6">
-          <Button
-            type="button"
-            variant="outline"
-            className="flex-1 rounded-2xl border-main-gray h-16 text-[10px] font-black uppercase tracking-widest"
-            onClick={() => router.back()}
-          >
-            Back
-          </Button>
-          <Button 
-            type="submit" 
-            disabled={!selectedOption} 
-            className="flex-[2] rounded-2xl h-16 text-[10px] font-black uppercase tracking-widest shadow-xl shadow-main-darkbrown/10"
-          >
-            Confirm & Continue
-          </Button>
+          <Button type="button" variant="outline" className="flex-1 rounded-2xl border-main-gray h-16 text-[10px] font-bold uppercase tracking-widest" onClick={() => router.back()}>Back</Button>
+          <Button type="submit" disabled={!selectedOption} className="flex-[2] rounded-2xl h-16 text-[10px] font-bold uppercase tracking-widest shadow-xl shadow-main-darkbrown/10">Confirm & Continue</Button>
         </div>
       </form>
     </div>
