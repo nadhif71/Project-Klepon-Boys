@@ -63,3 +63,7 @@ func (s *HotelService) GetHotelBookingsByUser(ctx context.Context, user_id any) 
 	res, err := s.db.GetHotelBookingsByUser(ctx, userId)
 	return res, err
 }
+
+func (s *HotelService) GetHotelBookingByID(ctx context.Context, id int) (db.GetHotelBookingByIDRow, error) {
+	return s.db.GetHotelBookingByID(ctx, int32(id))
+}

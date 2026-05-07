@@ -80,6 +80,10 @@ func (s *TiketService) GetTicketOrdersByUser(ctx context.Context, user_id any) (
 	return res, err
 }
 
+func (s *TiketService) GetTicketOrderByID(ctx context.Context, id int) (db.GetTicketOrderByIDRow, error) {
+	return s.db.GetTicketOrderByID(ctx, int32(id))
+}
+
 func StringToNullUUID(userIDInterface any) (uuid.NullUUID, error) {
 	userIDStr, ok := userIDInterface.(string)
 	if !ok {

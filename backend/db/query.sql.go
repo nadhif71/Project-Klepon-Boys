@@ -15,6 +15,43 @@ import (
 	"github.com/sqlc-dev/pqtype"
 )
 
+const createConcert = `-- name: CreateConcert :one
+INSERT INTO concerts (venue_id, title, artist_name, event_date, description, image_url)
+VALUES ($1, $2, $3, $4, $5, $6)
+RETURNING id, venue_id, title, artist_name, event_date, description, image_url
+`
+
+type CreateConcertParams struct {
+	VenueID     sql.NullInt32
+	Title       string
+	ArtistName  string
+	EventDate   time.Time
+	Description sql.NullString
+	ImageUrl    sql.NullString
+}
+
+func (q *Queries) CreateConcert(ctx context.Context, arg CreateConcertParams) (Concert, error) {
+	row := q.db.QueryRowContext(ctx, createConcert,
+		arg.VenueID,
+		arg.Title,
+		arg.ArtistName,
+		arg.EventDate,
+		arg.Description,
+		arg.ImageUrl,
+	)
+	var i Concert
+	err := row.Scan(
+		&i.ID,
+		&i.VenueID,
+		&i.Title,
+		&i.ArtistName,
+		&i.EventDate,
+		&i.Description,
+		&i.ImageUrl,
+	)
+	return i, err
+}
+
 const createCrowdCheckin = `-- name: CreateCrowdCheckin :one
 INSERT INTO crowd_checkins (user_id, pickup_point_id)
 VALUES ($1, $2)
@@ -138,15 +175,17 @@ func (q *Queries) CreateTicketOrder(ctx context.Context, arg CreateTicketOrderPa
 
 const createUser = `-- name: CreateUser :one
 
-INSERT INTO users (email, password, role)
-VALUES ($1, $2, $3)
-RETURNING id, email, role, created_at
+INSERT INTO users (email, password, role, first_name, last_name)
+VALUES ($1, $2, $3, $4, $5)
+RETURNING id, email, role, created_at, first_name, last_name
 `
 
 type CreateUserParams struct {
-	Email    string
-	Password string
-	Role     string
+	Email     string
+	Password  string
+	Role      string
+	FirstName string
+	LastName  string
 }
 
 type CreateUserRow struct {
@@ -154,23 +193,81 @@ type CreateUserRow struct {
 	Email     string
 	Role      string
 	CreatedAt time.Time
+	FirstName string
+	LastName  string
 }
 
 // ======================== FR-01: AUTH ========================
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (CreateUserRow, error) {
-	row := q.db.QueryRowContext(ctx, createUser, arg.Email, arg.Password, arg.Role)
+	row := q.db.QueryRowContext(ctx, createUser,
+		arg.Email,
+		arg.Password,
+		arg.Role,
+		arg.FirstName,
+		arg.LastName,
+	)
 	var i CreateUserRow
 	err := row.Scan(
 		&i.ID,
 		&i.Email,
 		&i.Role,
 		&i.CreatedAt,
+		&i.FirstName,
+		&i.LastName,
 	)
 	return i, err
 }
 
+const getCity = `-- name: GetCity :one
+SELECT id, name
+FROM cities
+WHERE id = $1
+LIMIT 1
+`
+
+func (q *Queries) GetCity(ctx context.Context, id int32) (City, error) {
+	row := q.db.QueryRowContext(ctx, getCity, id)
+	var i City
+	err := row.Scan(&i.ID, &i.Name)
+	return i, err
+}
+
+const getCityHubs = `-- name: GetCityHubs :many
+SELECT id, city_id, hub_name, hub_type
+FROM city_hubs
+WHERE city_id = $1
+`
+
+func (q *Queries) GetCityHubs(ctx context.Context, cityID int32) ([]CityHub, error) {
+	rows, err := q.db.QueryContext(ctx, getCityHubs, cityID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []CityHub
+	for rows.Next() {
+		var i CityHub
+		if err := rows.Scan(
+			&i.ID,
+			&i.CityID,
+			&i.HubName,
+			&i.HubType,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getConcert = `-- name: GetConcert :one
-SELECT id, venue_id, title, artist_name, event_date, description
+SELECT id, venue_id, title, artist_name, event_date, description, image_url
 FROM concerts
 WHERE id = $1
 LIMIT 1
@@ -186,12 +283,48 @@ func (q *Queries) GetConcert(ctx context.Context, id int32) (Concert, error) {
 		&i.ArtistName,
 		&i.EventDate,
 		&i.Description,
+		&i.ImageUrl,
+	)
+	return i, err
+}
+
+const getCrowdCheckin = `-- name: GetCrowdCheckin :one
+SELECT
+    cc.id, cc.check_in_time,
+    pp.id AS pickup_point_id, pp.name AS pickup_point_name,
+    v.id AS venue_id, v.name AS venue_name
+FROM crowd_checkins cc
+JOIN pickup_points pp ON cc.pickup_point_id = pp.id
+JOIN venues v ON pp.venue_id = v.id
+WHERE cc.id = $1
+LIMIT 1
+`
+
+type GetCrowdCheckinRow struct {
+	ID              uuid.UUID
+	CheckInTime     time.Time
+	PickupPointID   int32
+	PickupPointName string
+	VenueID         int32
+	VenueName       string
+}
+
+func (q *Queries) GetCrowdCheckin(ctx context.Context, id uuid.UUID) (GetCrowdCheckinRow, error) {
+	row := q.db.QueryRowContext(ctx, getCrowdCheckin, id)
+	var i GetCrowdCheckinRow
+	err := row.Scan(
+		&i.ID,
+		&i.CheckInTime,
+		&i.PickupPointID,
+		&i.PickupPointName,
+		&i.VenueID,
+		&i.VenueName,
 	)
 	return i, err
 }
 
 const getHotel = `-- name: GetHotel :one
-SELECT id, name, address, latitude, longitude, price_est, star_rating, facilities
+SELECT id, name, address, latitude, longitude, price_est, star_rating, facilities, images, description, is_recommended
 FROM hotels
 WHERE id = $1
 LIMIT 1
@@ -209,6 +342,56 @@ func (q *Queries) GetHotel(ctx context.Context, id int32) (Hotel, error) {
 		&i.PriceEst,
 		&i.StarRating,
 		pq.Array(&i.Facilities),
+		pq.Array(&i.Images),
+		&i.Description,
+		&i.IsRecommended,
+	)
+	return i, err
+}
+
+const getHotelBookingByID = `-- name: GetHotelBookingByID :one
+
+SELECT
+    b.id, b.check_in_date, b.check_out_date, b.status, b.created_at,
+    h.id AS hotel_id, h.name AS hotel_name, h.address, h.price_est, h.star_rating, h.images, h.description
+FROM hotel_bookings b
+JOIN hotels h ON b.hotel_id = h.id
+WHERE b.id = $1
+LIMIT 1
+`
+
+type GetHotelBookingByIDRow struct {
+	ID           int32
+	CheckInDate  time.Time
+	CheckOutDate time.Time
+	Status       string
+	CreatedAt    time.Time
+	HotelID      int32
+	HotelName    string
+	Address      string
+	PriceEst     sql.NullString
+	StarRating   sql.NullInt32
+	Images       []string
+	Description  sql.NullString
+}
+
+// ========== FR-10: INDIVIDUAL BOOKING DETAILS ==========
+func (q *Queries) GetHotelBookingByID(ctx context.Context, id int32) (GetHotelBookingByIDRow, error) {
+	row := q.db.QueryRowContext(ctx, getHotelBookingByID, id)
+	var i GetHotelBookingByIDRow
+	err := row.Scan(
+		&i.ID,
+		&i.CheckInDate,
+		&i.CheckOutDate,
+		&i.Status,
+		&i.CreatedAt,
+		&i.HotelID,
+		&i.HotelName,
+		&i.Address,
+		&i.PriceEst,
+		&i.StarRating,
+		pq.Array(&i.Images),
+		&i.Description,
 	)
 	return i, err
 }
@@ -266,6 +449,29 @@ func (q *Queries) GetHotelBookingsByUser(ctx context.Context, userID uuid.NullUU
 		return nil, err
 	}
 	return items, nil
+}
+
+const getIntercityByID = `-- name: GetIntercityByID :one
+SELECT id, user_id, origin_city, transport_mode, departure_date, return_date, status, created_at
+FROM intercity_transports
+WHERE id = $1
+LIMIT 1
+`
+
+func (q *Queries) GetIntercityByID(ctx context.Context, id int32) (IntercityTransport, error) {
+	row := q.db.QueryRowContext(ctx, getIntercityByID, id)
+	var i IntercityTransport
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.OriginCity,
+		&i.TransportMode,
+		&i.DepartureDate,
+		&i.ReturnDate,
+		&i.Status,
+		&i.CreatedAt,
+	)
+	return i, err
 }
 
 const getIntercityTransportsByUser = `-- name: GetIntercityTransportsByUser :many
@@ -369,6 +575,59 @@ func (q *Queries) GetRoutesForVenue(ctx context.Context, destinationID sql.NullI
 	return items, nil
 }
 
+const getTicketOrderByID = `-- name: GetTicketOrderByID :one
+SELECT
+    o.id, o.quantity, o.status, o.created_at,
+    t.id AS ticket_id, t.tier, t.price,
+    c.id AS concert_id, c.title AS concert_title, c.artist_name, c.event_date, c.image_url AS concert_image_url,
+    v.id AS venue_id, v.name AS venue_name
+FROM ticket_orders o
+JOIN tickets t ON o.ticket_id = t.id
+JOIN concerts c ON t.concert_id = c.id
+JOIN venues v ON c.venue_id = v.id
+WHERE o.id = $1
+LIMIT 1
+`
+
+type GetTicketOrderByIDRow struct {
+	ID              int32
+	Quantity        int32
+	Status          string
+	CreatedAt       time.Time
+	TicketID        int32
+	Tier            string
+	Price           string
+	ConcertID       int32
+	ConcertTitle    string
+	ArtistName      string
+	EventDate       time.Time
+	ConcertImageUrl sql.NullString
+	VenueID         int32
+	VenueName       string
+}
+
+func (q *Queries) GetTicketOrderByID(ctx context.Context, id int32) (GetTicketOrderByIDRow, error) {
+	row := q.db.QueryRowContext(ctx, getTicketOrderByID, id)
+	var i GetTicketOrderByIDRow
+	err := row.Scan(
+		&i.ID,
+		&i.Quantity,
+		&i.Status,
+		&i.CreatedAt,
+		&i.TicketID,
+		&i.Tier,
+		&i.Price,
+		&i.ConcertID,
+		&i.ConcertTitle,
+		&i.ArtistName,
+		&i.EventDate,
+		&i.ConcertImageUrl,
+		&i.VenueID,
+		&i.VenueName,
+	)
+	return i, err
+}
+
 const getTicketOrdersByUser = `-- name: GetTicketOrdersByUser :many
 SELECT
     o.id, o.quantity, o.status, o.created_at,
@@ -467,21 +726,69 @@ func (q *Queries) GetTicketsForConcert(ctx context.Context, concertID sql.NullIn
 }
 
 const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT id, email, password, role, created_at
+SELECT id, email, password, role, created_at, first_name, last_name
 FROM users
 WHERE email = $1
 LIMIT 1
 `
 
-func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error) {
+type GetUserByEmailRow struct {
+	ID        uuid.UUID
+	Email     string
+	Password  string
+	Role      string
+	CreatedAt time.Time
+	FirstName string
+	LastName  string
+}
+
+func (q *Queries) GetUserByEmail(ctx context.Context, email string) (GetUserByEmailRow, error) {
 	row := q.db.QueryRowContext(ctx, getUserByEmail, email)
-	var i User
+	var i GetUserByEmailRow
 	err := row.Scan(
 		&i.ID,
 		&i.Email,
 		&i.Password,
 		&i.Role,
 		&i.CreatedAt,
+		&i.FirstName,
+		&i.LastName,
+	)
+	return i, err
+}
+
+const getUserByResetToken = `-- name: GetUserByResetToken :one
+SELECT id, email, password, role, created_at, first_name, last_name, reset_token, reset_token_expiry
+FROM users
+WHERE reset_token = $1
+LIMIT 1
+`
+
+type GetUserByResetTokenRow struct {
+	ID               uuid.UUID
+	Email            string
+	Password         string
+	Role             string
+	CreatedAt        time.Time
+	FirstName        string
+	LastName         string
+	ResetToken       sql.NullString
+	ResetTokenExpiry sql.NullTime
+}
+
+func (q *Queries) GetUserByResetToken(ctx context.Context, resetToken sql.NullString) (GetUserByResetTokenRow, error) {
+	row := q.db.QueryRowContext(ctx, getUserByResetToken, resetToken)
+	var i GetUserByResetTokenRow
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.Password,
+		&i.Role,
+		&i.CreatedAt,
+		&i.FirstName,
+		&i.LastName,
+		&i.ResetToken,
+		&i.ResetTokenExpiry,
 	)
 	return i, err
 }
@@ -569,9 +876,114 @@ func (q *Queries) GetUserDashboard(ctx context.Context, userID uuid.NullUUID) ([
 	return items, nil
 }
 
+const getVenue = `-- name: GetVenue :one
+SELECT id, name, address, latitude, longitude, image_url, description
+FROM venues
+WHERE id = $1
+LIMIT 1
+`
+
+func (q *Queries) GetVenue(ctx context.Context, id int32) (Venue, error) {
+	row := q.db.QueryRowContext(ctx, getVenue, id)
+	var i Venue
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Address,
+		&i.Latitude,
+		&i.Longitude,
+		&i.ImageUrl,
+		&i.Description,
+	)
+	return i, err
+}
+
+const listCities = `-- name: ListCities :many
+
+SELECT id, name
+FROM cities
+`
+
+// ============== FR-09: CITIES & TRANSPORT HUBS ==============
+func (q *Queries) ListCities(ctx context.Context) ([]City, error) {
+	rows, err := q.db.QueryContext(ctx, listCities)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []City
+	for rows.Next() {
+		var i City
+		if err := rows.Scan(&i.ID, &i.Name); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listCrowdCheckins = `-- name: ListCrowdCheckins :many
+
+SELECT
+    cc.id, cc.check_in_time,
+    pp.id AS pickup_point_id, pp.name AS pickup_point_name,
+    v.id AS venue_id, v.name AS venue_name
+FROM crowd_checkins cc
+JOIN pickup_points pp ON cc.pickup_point_id = pp.id
+JOIN venues v ON pp.venue_id = v.id
+WHERE cc.user_id = $1
+ORDER BY cc.check_in_time DESC
+`
+
+type ListCrowdCheckinsRow struct {
+	ID              uuid.UUID
+	CheckInTime     time.Time
+	PickupPointID   int32
+	PickupPointName string
+	VenueID         int32
+	VenueName       string
+}
+
+// ============== FR-11: CROWD CHECK-INS ==============
+func (q *Queries) ListCrowdCheckins(ctx context.Context, userID uuid.NullUUID) ([]ListCrowdCheckinsRow, error) {
+	rows, err := q.db.QueryContext(ctx, listCrowdCheckins, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListCrowdCheckinsRow
+	for rows.Next() {
+		var i ListCrowdCheckinsRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.CheckInTime,
+			&i.PickupPointID,
+			&i.PickupPointName,
+			&i.VenueID,
+			&i.VenueName,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listHotels = `-- name: ListHotels :many
 
-SELECT id, name, address, latitude, longitude, price_est, star_rating, facilities
+SELECT id, name, address, latitude, longitude, price_est, star_rating, facilities, images, description, is_recommended
 FROM hotels
 `
 
@@ -594,6 +1006,9 @@ func (q *Queries) ListHotels(ctx context.Context) ([]Hotel, error) {
 			&i.PriceEst,
 			&i.StarRating,
 			pq.Array(&i.Facilities),
+			pq.Array(&i.Images),
+			&i.Description,
+			&i.IsRecommended,
 		); err != nil {
 			return nil, err
 		}
@@ -657,11 +1072,94 @@ func (q *Queries) ListPickupPointsForVenue(ctx context.Context, venueID sql.Null
 	return items, nil
 }
 
+const listTransportOptions = `-- name: ListTransportOptions :many
+SELECT
+    topt.id, topt.provider_name, topt.price, topt.departure_time, topt.arrival_time, topt.class, topt.travel_date,
+    oh.id AS origin_hub_id, oh.hub_name AS origin_hub_name, oh.hub_type AS origin_hub_type,
+    oc.id AS origin_city_id, oc.name AS origin_city_name,
+    dh.id AS dest_hub_id, dh.hub_name AS dest_hub_name, dh.hub_type AS dest_hub_type,
+    dc.id AS dest_city_id, dc.name AS dest_city_name
+FROM transport_options topt
+JOIN city_hubs oh ON topt.origin_hub_id = oh.id
+JOIN cities oc ON oh.city_id = oc.id
+JOIN city_hubs dh ON topt.destination_hub_id = dh.id
+JOIN cities dc ON dh.city_id = dc.id
+WHERE ($1::int = 0 OR oh.id = $1::int)
+  AND ($2::int = 0 OR dh.id = $2::int)
+ORDER BY topt.departure_time ASC
+`
+
+type ListTransportOptionsParams struct {
+	Column1 int32
+	Column2 int32
+}
+
+type ListTransportOptionsRow struct {
+	ID             int32
+	ProviderName   string
+	Price          string
+	DepartureTime  time.Time
+	ArrivalTime    time.Time
+	Class          sql.NullString
+	TravelDate     time.Time
+	OriginHubID    int32
+	OriginHubName  string
+	OriginHubType  string
+	OriginCityID   int32
+	OriginCityName string
+	DestHubID      int32
+	DestHubName    string
+	DestHubType    string
+	DestCityID     int32
+	DestCityName   string
+}
+
+func (q *Queries) ListTransportOptions(ctx context.Context, arg ListTransportOptionsParams) ([]ListTransportOptionsRow, error) {
+	rows, err := q.db.QueryContext(ctx, listTransportOptions, arg.Column1, arg.Column2)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListTransportOptionsRow
+	for rows.Next() {
+		var i ListTransportOptionsRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.ProviderName,
+			&i.Price,
+			&i.DepartureTime,
+			&i.ArrivalTime,
+			&i.Class,
+			&i.TravelDate,
+			&i.OriginHubID,
+			&i.OriginHubName,
+			&i.OriginHubType,
+			&i.OriginCityID,
+			&i.OriginCityName,
+			&i.DestHubID,
+			&i.DestHubName,
+			&i.DestHubType,
+			&i.DestCityID,
+			&i.DestCityName,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listUpcomingConcerts = `-- name: ListUpcomingConcerts :many
 
 SELECT
-    c.id, c.title, c.artist_name, c.event_date, c.description,
-    v.id AS venue_id, v.name AS venue_name, v.latitude, v.longitude
+    c.id, c.title, c.artist_name, c.event_date, c.description, c.image_url,
+    v.id AS venue_id, v.name AS venue_name, v.address AS venue_address, v.latitude, v.longitude, v.image_url AS venue_image_url
 FROM concerts c
 JOIN venues v ON c.venue_id = v.id
 WHERE c.event_date >= NOW()
@@ -669,15 +1167,18 @@ ORDER BY c.event_date ASC
 `
 
 type ListUpcomingConcertsRow struct {
-	ID          int32
-	Title       string
-	ArtistName  string
-	EventDate   time.Time
-	Description sql.NullString
-	VenueID     int32
-	VenueName   string
-	Latitude    string
-	Longitude   string
+	ID            int32
+	Title         string
+	ArtistName    string
+	EventDate     time.Time
+	Description   sql.NullString
+	ImageUrl      sql.NullString
+	VenueID       int32
+	VenueName     string
+	VenueAddress  string
+	Latitude      string
+	Longitude     string
+	VenueImageUrl sql.NullString
 }
 
 // =================== FR-02: CONCERTS & TICKETS ===================
@@ -696,10 +1197,51 @@ func (q *Queries) ListUpcomingConcerts(ctx context.Context) ([]ListUpcomingConce
 			&i.ArtistName,
 			&i.EventDate,
 			&i.Description,
+			&i.ImageUrl,
 			&i.VenueID,
 			&i.VenueName,
+			&i.VenueAddress,
 			&i.Latitude,
 			&i.Longitude,
+			&i.VenueImageUrl,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listVenues = `-- name: ListVenues :many
+
+SELECT id, name, address, latitude, longitude, image_url, description
+FROM venues
+`
+
+// ================ FR-08: VENUES ================
+func (q *Queries) ListVenues(ctx context.Context) ([]Venue, error) {
+	rows, err := q.db.QueryContext(ctx, listVenues)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Venue
+	for rows.Next() {
+		var i Venue
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Address,
+			&i.Latitude,
+			&i.Longitude,
+			&i.ImageUrl,
+			&i.Description,
 		); err != nil {
 			return nil, err
 		}
@@ -737,4 +1279,39 @@ func (q *Queries) UpdateTicketStock(ctx context.Context, arg UpdateTicketStockPa
 	var i UpdateTicketStockRow
 	err := row.Scan(&i.ID, &i.Stock)
 	return i, err
+}
+
+const updateUserPassword = `-- name: UpdateUserPassword :exec
+UPDATE users
+SET password = $2, reset_token = NULL, reset_token_expiry = NULL
+WHERE id = $1
+`
+
+type UpdateUserPasswordParams struct {
+	ID       uuid.UUID
+	Password string
+}
+
+func (q *Queries) UpdateUserPassword(ctx context.Context, arg UpdateUserPasswordParams) error {
+	_, err := q.db.ExecContext(ctx, updateUserPassword, arg.ID, arg.Password)
+	return err
+}
+
+const updateUserResetToken = `-- name: UpdateUserResetToken :exec
+
+UPDATE users
+SET reset_token = $2, reset_token_expiry = $3
+WHERE email = $1
+`
+
+type UpdateUserResetTokenParams struct {
+	Email            string
+	ResetToken       sql.NullString
+	ResetTokenExpiry sql.NullTime
+}
+
+// ============== FR-12: PASSWORD RESET ==============
+func (q *Queries) UpdateUserResetToken(ctx context.Context, arg UpdateUserResetTokenParams) error {
+	_, err := q.db.ExecContext(ctx, updateUserResetToken, arg.Email, arg.ResetToken, arg.ResetTokenExpiry)
+	return err
 }

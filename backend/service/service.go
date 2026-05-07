@@ -11,6 +11,8 @@ type Services struct {
 	Intercity *IntercityService
 	Pickup    *PickupService
 	Dashboard *DashboardService
+	Venue     *VenueService
+	Transport *TransportService
 }
 
 func NewServices(queries *db.Queries, jwtSecret []byte) *Services {
@@ -23,5 +25,7 @@ func NewServices(queries *db.Queries, jwtSecret []byte) *Services {
 		Intercity: NewIntercityService(queries),
 		Pickup:    NewPickupService(queries),
 		Dashboard: NewDashboardService(queries),
+		Venue:     NewVenueService(queries),
+		Transport: NewTransportService(queries),
 	}
 }

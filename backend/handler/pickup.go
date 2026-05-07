@@ -53,3 +53,28 @@ func (h *PickupHandler) CreateCrowdCheckin(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, res)
 }
+
+func (h *PickupHandler) ListCrowdCheckins(c *gin.Context) {
+	userId, exist := c.Get("user_id")
+	if exist == false {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "login dulu"})
+		return
+	}
+
+	res, err := h.pickupService.ListCrowdCheckins(c, userId)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+	}
+	c.JSON(http.StatusOK, res)
+}
+
+func (h *PickupHandler) GetCrowdCheckin(c *gin.Context) {
+	idStr := c.Param("id")
+
+	res, err := h.pickupService.GetCrowdCheckin(c, idStr)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "checkin not found"})
+		return
+	}
+	c.JSON(http.StatusOK, res)
+}

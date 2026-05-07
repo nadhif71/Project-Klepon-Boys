@@ -2,6 +2,9 @@ package service
 
 import (
 	"context"
+	"crypto/rand"
+	"database/sql"
+	"encoding/hex"
 	"fmt"
 	"time"
 
@@ -29,51 +32,101 @@ func NewAuthService(db *db.Queries, jwtSecret []byte) *AuthService {
 	}
 }
 
-func (s *AuthService) Login(ctx context.Context, email, password string) (string, db.User, error) {
+func (s *AuthService) Login(ctx context.Context, email, password string) (string, db.GetUserByEmailRow, error) {
 	user, err := s.db.GetUserByEmail(ctx, email)
 	if err != nil {
-		return "", db.User{}, fmt.Errorf("invalid credentials")
+		return "", db.GetUserByEmailRow{}, fmt.Errorf("invalid credentials")
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil {
-		return "", db.User{}, fmt.Errorf("invalid credentials")
+		return "", db.GetUserByEmailRow{}, fmt.Errorf("invalid credentials")
 	}
 
 	token, err := s.GenerateToken(user.ID.String(), user.Email, user.Role)
 	if err != nil {
-		return "", db.User{}, fmt.Errorf("failed to generate token")
+		return "", db.GetUserByEmailRow{}, fmt.Errorf("failed to generate token")
 	}
 
 	return token, user, nil
 }
 
-func (s *AuthService) Register(ctx context.Context, email, password, role string) (string, db.User, error) {
+func (s *AuthService) Register(ctx context.Context, email, password, role, firstName, lastName string) (string, db.CreateUserRow, error) {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
-		return "", db.User{}, fmt.Errorf("failed to hash password")
+		return "", db.CreateUserRow{}, fmt.Errorf("failed to hash password")
 	}
 
 	user, err := s.db.CreateUser(ctx, db.CreateUserParams{
-		Email:    email,
-		Password: string(hashedPassword),
-		Role:     role,
+		Email:     email,
+		Password:  string(hashedPassword),
+		Role:      role,
+		FirstName: firstName,
+		LastName:  lastName,
 	})
 	if err != nil {
-		return "", db.User{}, fmt.Errorf("user already exists")
+		return "", db.CreateUserRow{}, fmt.Errorf("user already exists")
 	}
 
 	token, err := s.GenerateToken(user.ID.String(), user.Email, user.Role)
 	if err != nil {
-		return "", db.User{}, fmt.Errorf("failed to generate token")
+		return "", db.CreateUserRow{}, fmt.Errorf("failed to generate token")
 	}
 
-	return token, db.User{
-		ID:        user.ID,
-		Email:     user.Email,
-		Role:      user.Role,
-		CreatedAt: user.CreatedAt,
-	}, nil
+	return token, user, nil
+}
+
+func (s *AuthService) ForgotPassword(ctx context.Context, email string) (string, error) {
+	_, err := s.db.GetUserByEmail(ctx, email)
+	if err != nil {
+		return "", fmt.Errorf("email not found")
+	}
+
+	tokenBytes := make([]byte, 32)
+	_, err = rand.Read(tokenBytes)
+	if err != nil {
+		return "", fmt.Errorf("failed to generate token")
+	}
+	resetToken := hex.EncodeToString(tokenBytes)
+
+	expiry := time.Now().Add(1 * time.Hour)
+
+	err = s.db.UpdateUserResetToken(ctx, db.UpdateUserResetTokenParams{
+		Email:            email,
+		ResetToken:       sql.NullString{String: resetToken, Valid: true},
+		ResetTokenExpiry: sql.NullTime{Time: expiry, Valid: true},
+	})
+	if err != nil {
+		return "", fmt.Errorf("failed to store reset token")
+	}
+
+	return resetToken, nil
+}
+
+func (s *AuthService) ResetPassword(ctx context.Context, token, newPassword string) error {
+	user, err := s.db.GetUserByResetToken(ctx, sql.NullString{String: token, Valid: true})
+	if err != nil {
+		return fmt.Errorf("invalid or expired reset token")
+	}
+
+	if !user.ResetTokenExpiry.Valid || time.Now().After(user.ResetTokenExpiry.Time) {
+		return fmt.Errorf("reset token has expired")
+	}
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return fmt.Errorf("failed to hash password")
+	}
+
+	err = s.db.UpdateUserPassword(ctx, db.UpdateUserPasswordParams{
+		ID:       user.ID,
+		Password: string(hashedPassword),
+	})
+	if err != nil {
+		return fmt.Errorf("failed to update password")
+	}
+
+	return nil
 }
 
 // Generate JWT token

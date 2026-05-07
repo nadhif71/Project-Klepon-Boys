@@ -54,3 +54,7 @@ func (s *IntercityService) GetIntercityTransportByUser(ctx context.Context, user
 	res, err := s.db.GetIntercityTransportsByUser(ctx, userId)
 	return res, err
 }
+
+func (s *IntercityService) GetIntercityByID(ctx context.Context, id int) (db.IntercityTransport, error) {
+	return s.db.GetIntercityByID(ctx, int32(id))
+}

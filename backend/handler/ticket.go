@@ -91,3 +91,19 @@ func (h *TicketHandler) GetTicketOrdersByUser(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, res)
 }
+
+func (h *TicketHandler) GetTicketOrder(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID harus berupa angka"})
+		return
+	}
+
+	res, err := h.ticketService.GetTicketOrderByID(c, id)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "order not found"})
+		return
+	}
+	c.JSON(http.StatusOK, res)
+}

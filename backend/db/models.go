@@ -57,6 +57,18 @@ func (ns NullTransportType) Value() (driver.Value, error) {
 	return string(ns.TransportType), nil
 }
 
+type City struct {
+	ID   int32
+	Name string
+}
+
+type CityHub struct {
+	ID      int32
+	CityID  int32
+	HubName string
+	HubType string
+}
+
 type Concert struct {
 	ID          int32
 	VenueID     sql.NullInt32
@@ -64,6 +76,7 @@ type Concert struct {
 	ArtistName  string
 	EventDate   time.Time
 	Description sql.NullString
+	ImageUrl    sql.NullString
 }
 
 type CrowdCheckin struct {
@@ -74,14 +87,17 @@ type CrowdCheckin struct {
 }
 
 type Hotel struct {
-	ID         int32
-	Name       string
-	Address    string
-	Latitude   string
-	Longitude  string
-	PriceEst   sql.NullString
-	StarRating sql.NullInt32
-	Facilities []string
+	ID            int32
+	Name          string
+	Address       string
+	Latitude      string
+	Longitude     string
+	PriceEst      sql.NullString
+	StarRating    sql.NullInt32
+	Facilities    []string
+	Images        []string
+	Description   sql.NullString
+	IsRecommended bool
 }
 
 type HotelBooking struct {
@@ -137,6 +153,18 @@ type TransportGeometry struct {
 	PathJson pqtype.NullRawMessage
 }
 
+type TransportOption struct {
+	ID               int32
+	OriginHubID      int32
+	DestinationHubID int32
+	ProviderName     string
+	Price            string
+	DepartureTime    time.Time
+	ArrivalTime      time.Time
+	Class            sql.NullString
+	TravelDate       time.Time
+}
+
 type TransportRoute struct {
 	ID            int32
 	Mode          TransportType
@@ -148,17 +176,23 @@ type TransportRoute struct {
 }
 
 type User struct {
-	ID        uuid.UUID
-	Email     string
-	Password  string
-	Role      string
-	CreatedAt time.Time
+	ID               uuid.UUID
+	Email            string
+	Password         string
+	Role             string
+	FirstName        string
+	LastName         string
+	ResetToken       sql.NullString
+	ResetTokenExpiry sql.NullTime
+	CreatedAt        time.Time
 }
 
 type Venue struct {
-	ID        int32
-	Name      string
-	Address   string
-	Latitude  string
-	Longitude string
+	ID          int32
+	Name        string
+	Address     string
+	Latitude    string
+	Longitude   string
+	ImageUrl    sql.NullString
+	Description sql.NullString
 }

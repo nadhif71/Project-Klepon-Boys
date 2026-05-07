@@ -1,19 +1,25 @@
 -- 1. Users Table
 CREATE TABLE users (
-    id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    email      VARCHAR(255) UNIQUE NOT NULL CHECK (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'),
-    password   TEXT NOT NULL,
-    role       VARCHAR(50) NOT NULL DEFAULT 'User',
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    email             VARCHAR(255) UNIQUE NOT NULL CHECK (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'),
+    password          TEXT NOT NULL,
+    role              VARCHAR(50) NOT NULL DEFAULT 'User',
+    first_name        VARCHAR(255) NOT NULL DEFAULT '',
+    last_name         VARCHAR(255) NOT NULL DEFAULT '',
+    reset_token       TEXT,
+    reset_token_expiry TIMESTAMPTZ,
+    created_at        TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- 2. Venues Table
 CREATE TABLE venues (
-    id        SERIAL PRIMARY KEY,
-    name      VARCHAR(255) NOT NULL,
-    address   TEXT NOT NULL,
-    latitude  DECIMAL(9,6) NOT NULL,
-    longitude DECIMAL(9,6) NOT NULL
+    id          SERIAL PRIMARY KEY,
+    name        VARCHAR(255) NOT NULL,
+    address     TEXT NOT NULL,
+    latitude    DECIMAL(9,6) NOT NULL,
+    longitude   DECIMAL(9,6) NOT NULL,
+    image_url   VARCHAR(255),
+    description TEXT
 );
 
 -- 3. Concerts Table
@@ -23,7 +29,8 @@ CREATE TABLE concerts (
     title       VARCHAR(255) NOT NULL,
     artist_name VARCHAR(255) NOT NULL,
     event_date  TIMESTAMPTZ NOT NULL,
-    description TEXT
+    description TEXT,
+    image_url   VARCHAR(255)
     -- Removed: ticket_id (circular ref; tickets reference concerts instead)
 );
 
@@ -38,14 +45,17 @@ CREATE TABLE tickets (
 
 -- 5. Hotels Table
 CREATE TABLE hotels (
-    id          SERIAL PRIMARY KEY,
-    name        VARCHAR(255) NOT NULL,
-    address     TEXT NOT NULL,
-    latitude    DECIMAL(9,6) NOT NULL,
-    longitude   DECIMAL(9,6) NOT NULL,
-    price_est   DECIMAL(12,2),
-    star_rating INT CHECK (star_rating >= 1 AND star_rating <= 5),
-    facilities  TEXT[]
+    id             SERIAL PRIMARY KEY,
+    name           VARCHAR(255) NOT NULL,
+    address        TEXT NOT NULL,
+    latitude       DECIMAL(9,6) NOT NULL,
+    longitude      DECIMAL(9,6) NOT NULL,
+    price_est      DECIMAL(12,2),
+    star_rating    INT CHECK (star_rating >= 1 AND star_rating <= 5),
+    facilities     TEXT[],
+    images         TEXT[],
+    description    TEXT,
+    is_recommended BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 -- 6. Transport Routes
@@ -115,4 +125,29 @@ CREATE TABLE intercity_transports (
     return_date    DATE,
     status         VARCHAR(50) NOT NULL DEFAULT 'pending',
     created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- 11. Cities & Transport Hubs (for transport wizard)
+CREATE TABLE cities (
+    id   SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE city_hubs (
+    id       SERIAL PRIMARY KEY,
+    city_id  INT NOT NULL REFERENCES cities(id) ON DELETE CASCADE,
+    hub_name VARCHAR(255) NOT NULL,
+    hub_type VARCHAR(10) NOT NULL CHECK (hub_type IN ('plane', 'train'))
+);
+
+CREATE TABLE transport_options (
+    id                SERIAL PRIMARY KEY,
+    origin_hub_id     INT NOT NULL REFERENCES city_hubs(id),
+    destination_hub_id INT NOT NULL REFERENCES city_hubs(id),
+    provider_name     VARCHAR(255) NOT NULL,
+    price             DECIMAL(12,2) NOT NULL,
+    departure_time    TIME NOT NULL,
+    arrival_time      TIME NOT NULL,
+    class             VARCHAR(100),
+    travel_date       DATE NOT NULL
 );

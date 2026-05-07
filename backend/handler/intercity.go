@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/nadhif71/Project-Klepon-Boys/service"
@@ -50,5 +51,21 @@ func (h *IntercityHandler) GetIntercityTransportsByUser(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, err)
 	}
 
+	c.JSON(http.StatusOK, res)
+}
+
+func (h *IntercityHandler) GetIntercity(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID harus berupa angka"})
+		return
+	}
+
+	res, err := h.intercityService.GetIntercityByID(c, id)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "transport plan not found"})
+		return
+	}
 	c.JSON(http.StatusOK, res)
 }

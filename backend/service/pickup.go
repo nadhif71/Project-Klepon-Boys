@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 
+	"github.com/google/uuid"
 	"github.com/nadhif71/Project-Klepon-Boys/db"
 )
 
@@ -41,4 +42,20 @@ func (s *PickupService) CreateCrowdCheckin(ctx context.Context, user_id any, pic
 	}
 	res, err := s.db.CreateCrowdCheckin(ctx, params)
 	return res, err
+}
+
+func (s *PickupService) ListCrowdCheckins(ctx context.Context, user_id any) ([]db.ListCrowdCheckinsRow, error) {
+	userId, err := StringToNullUUID(user_id)
+	if err != nil {
+		return nil, err
+	}
+	return s.db.ListCrowdCheckins(ctx, userId)
+}
+
+func (s *PickupService) GetCrowdCheckin(ctx context.Context, id string) (db.GetCrowdCheckinRow, error) {
+	uid, err := uuid.Parse(id)
+	if err != nil {
+		return db.GetCrowdCheckinRow{}, err
+	}
+	return s.db.GetCrowdCheckin(ctx, uid)
 }

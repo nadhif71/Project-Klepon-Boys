@@ -70,3 +70,19 @@ func (h *HotelHandler) GetHotelBookingsByUser(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, res)
 }
+
+func (h *HotelHandler) GetHotelBooking(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID harus berupa angka"})
+		return
+	}
+
+	res, err := h.hotelService.GetHotelBookingByID(c, id)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "booking not found"})
+		return
+	}
+	c.JSON(http.StatusOK, res)
+}

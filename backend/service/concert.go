@@ -25,3 +25,7 @@ func (s *ConcertService) ConcertsById(ctx context.Context, id int) (db.Concert, 
 	res, err := s.db.GetConcert(ctx, int32(id))
 	return res, err
 }
+
+func (s *ConcertService) CreateConcert(ctx context.Context, arg db.CreateConcertParams) (db.Concert, error) {
+	return s.db.CreateConcert(ctx, arg)
+}
