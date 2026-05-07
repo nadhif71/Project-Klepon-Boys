@@ -22,7 +22,7 @@ export default function PlanLayout({ children }: { children: React.ReactNode }) 
   return (
     <div className="flex min-h-screen flex-col bg-white font-avenir">
       <Navbar />
-      <div className="flex-1 py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      <div className="flex-1 py-12 px-4 sm:px-6 lg:px-8 relative">
         <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
           <div className="absolute top-0 left-0 w-full h-[600px] bg-gradient-to-b from-main-gold/5 via-white to-white"></div>
           <div className="absolute top-[20%] -right-[10%] w-[400px] h-[400px] rounded-full bg-main-yellow/10 blur-[100px]"></div>
