@@ -27,7 +27,6 @@ export const ConcertCarousel = () => {
             index === current ? 'opacity-100 z-10' : 'opacity-0 z-0'
           } ${banner.color}`}
         >
-          {/* Background Image / Placeholder */}
           <div className="absolute inset-0 z-0">
              {banner.img ? (
                <div className="relative w-full h-full">
@@ -39,7 +38,6 @@ export const ConcertCarousel = () => {
              )}
           </div>
 
-          {/* Content Overlay */}
           <div className="relative z-10 max-w-4xl font-avenir">
             <span className="inline-block px-3 py-1 md:px-4 md:py-1.5 rounded-full bg-main-yellow text-main-darkbrown text-[8px] md:text-[10px] font-bold uppercase tracking-[0.2em] mb-4 md:mb-6">
               Upcoming Event
@@ -63,7 +61,6 @@ export const ConcertCarousel = () => {
         </div>
       ))}
 
-      {/* Navigation Dots */}
       <div className="absolute bottom-4 md:bottom-10 right-6 md:right-20 z-20 flex gap-2">
         {concertBanners.map((_, i) => (
           <button
