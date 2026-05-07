@@ -1,57 +1,48 @@
+import React from 'react';
 import Link from 'next/link';
 
 export const Footer = () => {
   return (
-    <footer className="bg-main-darkbrown text-main-white py-16 border-t border-main-gold/20">
-      <div className="mx-auto max-w-7xl px-8 sm:px-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-start">
-          
-          {/* Left Side Column */}
-          <div className="flex flex-col gap-10">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="h-8 w-8 rounded-lg bg-main-yellow flex items-center justify-center">
-                <span className="text-main-darkbrown font-black text-sm italic">K</span>
+    <footer className="bg-main-darkbrown text-white py-16 px-6 font-avenir">
+      <div className="mx-auto max-w-7xl">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
+          <div className="col-span-1 md:col-span-2 space-y-6">
+            <Link href="/" className="inline-flex items-center gap-2 group">
+              <div className="h-10 w-10 rounded-xl bg-main-gold flex items-center justify-center">
+                <span className="text-main-darkbrown font-bold text-xl italic">K</span>
               </div>
-              <span className="text-xl font-black tracking-tighter text-main-white uppercase">
+              <span className="text-2xl font-bold tracking-tighter text-white">
                 KONSER<span className="text-main-gold">IN</span>
               </span>
             </Link>
-            
-            <div className="flex flex-col gap-4">
-              <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-main-gold mb-2">Pintasan</h4>
-              <div className="flex flex-col gap-3 text-[11px] font-black uppercase tracking-[0.2em] text-main-cream/40">
-                <Link href="#" className="hover:text-main-gold transition-colors">Tentang Kami</Link>
-                <Link href="#" className="hover:text-main-gold transition-colors">Kebijakan Privasi</Link>
-                <Link href="#" className="hover:text-main-gold transition-colors">Syarat & Ketentuan</Link>
-                <Link href="#" className="hover:text-main-gold transition-colors">Hubungi Kami</Link>
-              </div>
-            </div>
-            
-            <p className="text-[9px] text-main-cream/20 uppercase tracking-[0.4em] font-bold">
-              © 2026 PT Klepon Boys Indonesia
+            <p className="text-main-cream/40 text-sm font-bold uppercase tracking-widest leading-relaxed max-w-sm">
+              Solusi cerdas perencanaan konser Anda. Dari tiket hingga hotel, semua dalam satu genggaman.
             </p>
           </div>
-
-          {/* Right Side Column */}
-          <div className="flex flex-col md:items-end gap-10">
-             <div className="flex flex-col md:items-end gap-6">
-                <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-main-gold">Media Sosial</h4>
-                <div className="flex gap-4">
-                  {[1,2,3,4].map(i => (
-                    <div key={i} className="h-12 w-12 rounded-2xl border border-white/5 bg-white/[0.02] flex items-center justify-center text-main-cream/40 hover:border-main-gold hover:text-main-gold transition-all cursor-pointer group">
-                      <div className="h-5 w-5 bg-current rounded-full opacity-20 group-hover:opacity-100 transition-opacity"></div>
-                    </div>
-                  ))}
-                </div>
-             </div>
-             
-             <div className="flex flex-col md:items-end gap-4 max-w-[280px] md:text-right">
-                <p className="text-[10px] font-bold text-main-cream/30 uppercase tracking-[0.15em] leading-relaxed">
-                  Platform perencanaan konser nomor satu di Jakarta. Jadikan pengalaman musikmu tak terlupakan.
-                </p>
-             </div>
+          
+          <div>
+            <h4 className="text-main-gold text-[10px] font-bold uppercase tracking-[0.3em] mb-6">Quick Links</h4>
+            <ul className="space-y-4 text-xs font-bold uppercase tracking-widest text-white/60">
+              <li><Link href="/plan/ticket" className="hover:text-main-gold transition-colors">Start Planning</Link></li>
+              <li><Link href="/dashboard" className="hover:text-main-gold transition-colors">My Dashboard</Link></li>
+              <li><Link href="/login" className="hover:text-main-gold transition-colors">Sign In</Link></li>
+            </ul>
           </div>
 
+          <div>
+            <h4 className="text-main-gold text-[10px] font-bold uppercase tracking-[0.3em] mb-6">Support</h4>
+            <ul className="space-y-4 text-xs font-bold uppercase tracking-widest text-white/60">
+              <li><Link href="#" className="hover:text-main-gold transition-colors">FAQ</Link></li>
+              <li><Link href="#" className="hover:text-main-gold transition-colors">Contact Us</Link></li>
+              <li><Link href="#" className="hover:text-main-gold transition-colors">Privacy Policy</Link></li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
+          <p className="text-[10px] font-bold text-white/20 uppercase tracking-[0.4em]">
+            © 2026 KONSERIN PROJECT. ALL RIGHTS RESERVED.
+          </p>
         </div>
       </div>
     </footer>
