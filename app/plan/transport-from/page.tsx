@@ -156,7 +156,6 @@ export default function TransportFromPage() {
       <form onSubmit={handleFinish} className="space-y-8">
         <ScrollReveal delay={200}>
           <div className="grid grid-cols-1 gap-6">
-            {/* Origin Hub (Fixed from Jakarta) */}
             <div className="space-y-3 relative" ref={originRef}>
               <label className="block text-[8px] font-bold uppercase tracking-[0.2em] text-main-darkbrown/40 ml-1">Titik Jemput (Jakarta)</label>
               <div onClick={() => setIsOriginOpen(!isOriginOpen)} className="w-full rounded-xl border-2 border-main-gray bg-transparent px-5 py-4 flex items-center justify-between cursor-pointer hover:border-main-gold/50 transition-colors">
@@ -173,7 +172,6 @@ export default function TransportFromPage() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {/* Dest City */}
               <div className="space-y-3 relative" ref={cityRef}>
                 <label className="block text-[8px] font-bold uppercase tracking-[0.2em] text-main-darkbrown/40 ml-1">Kota Tujuan</label>
                 <div onClick={() => originHub && setIsCityOpen(!isCityOpen)} className={`w-full rounded-xl border-2 border-main-gray bg-transparent px-5 py-4 flex items-center justify-between cursor-pointer transition-colors ${!originHub ? 'opacity-50 cursor-not-allowed' : 'hover:border-main-gold/50'}`}>
@@ -189,7 +187,6 @@ export default function TransportFromPage() {
                 )}
               </div>
 
-              {/* Dest Hub */}
               <div className="space-y-3 relative" ref={hubRef}>
                 <label className="block text-[8px] font-bold uppercase tracking-[0.2em] text-main-darkbrown/40 ml-1">Titik Turun</label>
                 <div onClick={() => destCity && setIsHubOpen(!isHubOpen)} className={`w-full rounded-xl border-2 border-main-gray bg-transparent px-5 py-4 flex items-center justify-between cursor-pointer transition-colors ${!destCity ? 'opacity-50 cursor-not-allowed' : 'hover:border-main-gold/50'}`}>

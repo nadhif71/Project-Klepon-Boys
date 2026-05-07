@@ -152,7 +152,6 @@ export default function TransportToPage() {
         <ScrollReveal delay={200}>
           <div className="grid grid-cols-1 gap-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {/* Origin City */}
               <div className="space-y-3 relative" ref={cityRef}>
                 <label className="block text-[8px] font-bold uppercase tracking-[0.2em] text-main-darkbrown/40 ml-1">Kota Asal</label>
                 <div onClick={() => setIsCityOpen(!isCityOpen)} className="w-full rounded-xl border-2 border-main-gray bg-transparent px-5 py-4 flex items-center justify-between cursor-pointer hover:border-main-gold/50 transition-colors">
@@ -168,7 +167,6 @@ export default function TransportToPage() {
                 )}
               </div>
 
-              {/* Origin Hub */}
               <div className="space-y-3 relative" ref={hubRef}>
                 <label className="block text-[8px] font-bold uppercase tracking-[0.2em] text-main-darkbrown/40 ml-1">Titik Berangkat</label>
                 <div onClick={() => originCity && setIsHubOpen(!isHubOpen)} className={`w-full rounded-xl border-2 border-main-gray bg-transparent px-5 py-4 flex items-center justify-between cursor-pointer transition-colors ${!originCity ? 'opacity-50 cursor-not-allowed' : 'hover:border-main-gold/50'}`}>
@@ -185,7 +183,6 @@ export default function TransportToPage() {
               </div>
             </div>
 
-            {/* Destination Hub (Fixed to Jakarta) */}
             <div className="space-y-3 relative" ref={destRef}>
               <label className="block text-[8px] font-bold uppercase tracking-[0.2em] text-main-darkbrown/40 ml-1">Tujuan (Jakarta)</label>
               <div onClick={() => selectedHub && setIsDestOpen(!isDestOpen)} className={`w-full rounded-xl border-2 border-main-gray bg-transparent px-5 py-4 flex items-center justify-between cursor-pointer transition-colors ${!selectedHub ? 'opacity-50 cursor-not-allowed' : 'hover:border-main-gold/50'}`}>

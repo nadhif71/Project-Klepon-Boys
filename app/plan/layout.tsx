@@ -23,14 +23,12 @@ export default function PlanLayout({ children }: { children: React.ReactNode }) 
     <div className="flex min-h-screen flex-col bg-white font-avenir">
       <Navbar />
       <div className="flex-1 py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-        {/* Unique Background Design */}
         <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
           <div className="absolute top-0 left-0 w-full h-[600px] bg-gradient-to-b from-main-gold/5 via-white to-white"></div>
           <div className="absolute top-[20%] -right-[10%] w-[400px] h-[400px] rounded-full bg-main-yellow/10 blur-[100px]"></div>
         </div>
 
         <div className="mx-auto max-w-2xl">
-          {/* Refined Progress Bar */}
           <ScrollReveal direction="none">
             <nav aria-label="Progress" className="mb-20">
               <ol role="list" className="flex items-center justify-between gap-1 sm:gap-2">
@@ -64,7 +62,6 @@ export default function PlanLayout({ children }: { children: React.ReactNode }) 
                       )}
                     </div>
 
-                    {/* Step label for Desktop */}
                     <div className="absolute top-12 left-1/2 -translate-x-1/2 hidden md:block w-24 text-center">
                       <span className={`text-[7px] font-bold uppercase tracking-widest leading-tight block ${
                         index === currentStepIndex ? 'text-main-gold' : 'text-main-darkbrown/20'
@@ -78,7 +75,6 @@ export default function PlanLayout({ children }: { children: React.ReactNode }) 
             </nav>
           </ScrollReveal>
 
-          {/* Page Content with Scroll Reveal */}
           <ScrollReveal delay={200}>
             <div className="rounded-2xl bg-main-white p-8 shadow-xl shadow-main-darkbrown/5 sm:p-12">
               {children}

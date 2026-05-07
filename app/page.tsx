@@ -44,21 +44,21 @@ export default function Home() {
   ];
 
   const travelPartners = [
-    { name: "Garuda Indonesia", img: "/images/garuda.webp", price: "Starts Rp 1.2M", info: "Flight • Priority", type: 'plane', desc: "Maskapai bintang 5 dengan pelayanan premium. Nikmati kenyamanan perjalanan udara terbaik menuju Jakarta." },
+    { name: "Garuda Indonesia", img: "/images/garuda.webp", price: "Starts Rp 1.2jt", info: "Flight • Priority", type: 'plane', desc: "Maskapai bintang 5 dengan pelayanan premium. Nikmati kenyamanan perjalanan udara terbaik menuju Jakarta." },
     { name: "KAI Argo Bromo", img: "/images/argobromo.webp", price: "Starts Rp 600k", info: "Train • Executive", type: 'train', desc: "Kereta api eksekutif dengan pemandangan indah sepanjang pulau Jawa. Tepat waktu dan nyaman." },
     { name: "Citilink Airline", img: "/images/citilink.webp", price: "Starts Rp 800k", info: "Flight • Economy", type: 'plane', desc: "Penerbangan ekonomis dengan armada modern. Cara cerdas dan cepat untuk sampai ke lokasi konser." },
     { name: "KAI Taksaka", img: "/images/taksaka.webp", price: "Starts Rp 550k", info: "Train • Executive", type: 'train', desc: "Layanan kereta malam eksklusif dengan fasilitas lengkap. Istirahat maksimal, sampai di Jakarta dengan segar." },
-    { name: "Batik Air Business", img: "/images/batikair.webp", price: "Starts Rp 1.5M", info: "Flight • Premium", type: 'plane', desc: "Terbang dengan gaya eksekutif bersama Batik Air. Ruang kaki luas dan hidangan lezat menemani perjalanan Anda." },
+    { name: "Batik Air Business", img: "/images/batikair.webp", price: "Starts Rp 1.5jt", info: "Flight • Premium", type: 'plane', desc: "Terbang dengan gaya eksekutif bersama Batik Air. Ruang kaki luas dan hidangan lezat menemani perjalanan Anda." },
     { name: "KAI Argo Lawu", img: "/images/argolawu.webp", price: "Starts Rp 620k", info: "Train • Luxury", type: 'train', desc: "Salah satu kereta legendaris di Indonesia. Menawarkan kecepatan dan kenyamanan kelas atas untuk rute favorit." },
   ];
 
   const hotels = [
-    { name: "The Ritz-Carlton", price: "Rp 4.500.000", info: "5 Star • Kuningan", desc: "Kemewahan tiada tara di jantung kota Jakarta. Fasilitas kelas dunia dan layanan personal yang luar biasa.", img1: "/images/hotel1.webp", img2: "/images/pool1.webp", img3: "/images/room1.webp" },
-    { name: "Fairmont Jakarta", price: "Rp 3.800.000", info: "5 Star • Senayan", desc: "Lokasi paling strategis untuk konser di GBK. Akses langsung dan pemandangan lapangan golf yang ikonik.", img1: "/images/hotel1.webp", img2: "/images/pool1.webp", img3: "/images/room1.webp" },
-    { name: "Hotel Kempinski", price: "Rp 5.200.000", info: "5 Star • HI", desc: "Hotel bersejarah dengan sentuhan modern. Berada di pusat Jakarta dengan akses mudah ke seluruh moda transportasi.", img1: "/images/hotel1.webp", img2: "/images/pool1.webp", img3: "/images/room1.webp" },
-    { name: "Artotel GBK", price: "Rp 1.200.000", info: "4 Star • Senayan", desc: "Hotel gaya hidup dengan desain artistik. Pilihan tepat untuk penggemar musik yang mencari suasana kreatif.", img1: "/images/artotel1.webp", img2: "/images/artotel2.webp", img3: "/images/artotel3.webp" },
-    { name: "Park Hyatt Jakarta", price: "Rp 4.800.000", info: "5 Star • Menteng", desc: "Hotel ultra-mewah dengan desain modern elegan. Menawarkan kenyamanan tingkat tinggi di lokasi prestisius Menteng.", img1: "/images/hyatt1.webp", img2: "/images/hyatt2.webp", img3: "/images/hyatt3.webp" },
-    { name: "The Langham Jakarta", price: "Rp 5.500.000", info: "5 Star • SCBD", desc: "Standar baru kemewahan di Jakarta. Terletak di pusat bisnis elite dengan fasilitas spa dan restoran kelas dunia.", img1: "/images/langham1.webp", img2: "/images/langham2.webp", img3: "/images/langham3.webp" },
+    { name: "The Ritz-Carlton", price: "Rp 450.000", info: "5 Star • Kuningan", desc: "Kemewahan tiada tara di jantung kota Jakarta. Fasilitas kelas dunia dan layanan personal yang luar biasa.", img1: "/images/hotel1.webp", img2: "/images/pool1.webp", img3: "/images/room1.webp" },
+    { name: "Fairmont Jakarta", price: "Rp 380.000", info: "5 Star • Senayan", desc: "Lokasi paling strategis untuk konser di GBK. Akses langsung dan pemandangan lapangan golf yang ikonik.", img1: "/images/hotel2.webp", img2: "/images/pool2.webp", img3: "/images/room2.webp" },
+    { name: "Hotel Kempinski", price: "Rp 500.000", info: "5 Star • HI", desc: "Hotel bersejarah dengan sentuhan modern. Berada di pusat Jakarta dengan akses mudah ke seluruh moda transportasi.", img1: "/images/hotel3.webp", img2: "/images/pool3.webp", img3: "/images/room3.webp" },
+    { name: "Artotel GBK", price: "Rp 400.000", info: "4 Star • Senayan", desc: "Hotel gaya hidup dengan desain artistik. Pilihan tepat untuk penggemar musik yang mencari suasana kreatif.", img1: "/images/hotel1.webp", img2: "/images/pool3.webp", img3: "/images/room2.webp" },
+    { name: "Park Hyatt Jakarta", price: "Rp 480.000", info: "5 Star • Menteng", desc: "Hotel ultra-mewah dengan desain modern elegan. Menawarkan kenyamanan tingkat tinggi di lokasi prestisius Menteng.", img1: "/images/hotel3.webp", img2: "/images/pool2.webp", img3: "/images/room1.webp" },
+    { name: "The Langham Jakarta", price: "Rp 550.000", info: "5 Star • SCBD", desc: "Standar baru kemewahan di Jakarta. Terletak di pusat bisnis elite dengan fasilitas spa dan restoran kelas dunia.", img1: "/images/hotel2.webp", img2: "/images/pool1.webp", img3: "/images/room3.webp" },
   ];
 
   return (
@@ -85,7 +85,6 @@ export default function Home() {
 
             <div className="space-y-32">
               
-              {/* Category 1: Concerts */}
               <ScrollReveal>
                 <div className="space-y-8">
                   <div className="flex items-center justify-between px-2">
@@ -120,7 +119,6 @@ export default function Home() {
                 </div>
               </ScrollReveal>
 
-              {/* Category 2: Transport */}
               <ScrollReveal>
                 <div className="space-y-8">
                   <div className="flex items-center justify-between px-2">
@@ -154,7 +152,6 @@ export default function Home() {
                 </div>
               </ScrollReveal>
 
-              {/* Category 3: Hotels */}
               <ScrollReveal>
                 <div className="space-y-8">
                   <div className="flex items-center justify-between px-2">
@@ -199,12 +196,10 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Informational Popups */}
         {activePopup && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-main-darkbrown/90 backdrop-blur-xl animate-in fade-in duration-300">
              <div className="bg-white rounded-3xl max-w-2xl w-full relative shadow-2xl animate-in zoom-in-95 duration-300 overflow-hidden border border-main-gray">
                 
-                {/* Fixed Header with Close Button */}
                 <div className="bg-white border-b border-main-gray p-6 flex items-center justify-between">
                    <div className="flex flex-col">
                       <span className="text-[8px] font-bold text-main-gold uppercase tracking-[0.4em]">Details View</span>

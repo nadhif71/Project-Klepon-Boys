@@ -64,7 +64,6 @@ export default function LocalToHotelPage() {
           </div>
         </ScrollReveal>
 
-        {/* Dynamic Integration Display */}
         {type && !['Kendaraan Pribadi'].includes(type) && (
           <ScrollReveal delay={200}>
             <div className="rounded-2xl bg-white p-8 space-y-8 shadow-2xl shadow-main-darkbrown/5 animate-in zoom-in-95 duration-500">

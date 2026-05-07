@@ -4,7 +4,6 @@ import { Button } from '@/components/Button';
 export default function SignupPage() {
   return (
     <div className="min-h-screen flex flex-col bg-white selection:bg-main-gold/30 font-avenir">
-      {/* Background Decor */}
       <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
         <div className="absolute bottom-0 left-0 w-full h-[600px] bg-gradient-to-t from-main-gold/10 via-white to-white"></div>
         <div className="absolute bottom-[20%] -right-[10%] w-[500px] h-[500px] rounded-full bg-main-yellow/10 blur-[120px]"></div>

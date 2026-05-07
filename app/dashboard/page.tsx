@@ -77,7 +77,6 @@ export default function DashboardPage() {
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-main-darkbrown/90 backdrop-blur-xl animate-in fade-in duration-300">
              <div className="bg-white rounded-3xl max-w-2xl w-full relative shadow-2xl animate-in zoom-in-95 duration-300 overflow-hidden border border-main-gray">
                 
-                {/* Fixed Header with Close Button */}
                 <div className="bg-white border-b border-main-gray p-6 flex items-center justify-between">
                    <div className="flex flex-col">
                       <span className="text-[8px] font-bold text-main-gold uppercase tracking-[0.4em]">Details View</span>

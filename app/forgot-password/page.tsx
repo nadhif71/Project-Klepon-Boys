@@ -4,7 +4,6 @@ import { Button } from '@/components/Button';
 export default function ForgotPasswordPage() {
   return (
     <div className="min-h-screen flex flex-col bg-white selection:bg-main-gold/30 font-avenir">
-      {/* Background Decor */}
       <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
         <div className="absolute top-[30%] left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full bg-main-yellow/5 blur-[150px]"></div>
       </div>
